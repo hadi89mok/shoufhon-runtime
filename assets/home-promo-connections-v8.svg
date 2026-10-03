@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 360">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#181008"/><stop offset=".57" stop-color="#080604"/><stop offset="1" stop-color="#030303"/></linearGradient>
+  <linearGradient id="skin1"><stop stop-color="#d8a577"/><stop offset="1" stop-color="#88532f"/></linearGradient>
+  <linearGradient id="skin2"><stop stop-color="#f0c59d"/><stop offset="1" stop-color="#9a5f35"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="320" height="360" fill="url(#bg)"/>
+<circle cx="213" cy="172" r="108" fill="#d49327" opacity=".08"/>
+<g stroke="#b97822" stroke-opacity=".48" fill="none">
+  <circle cx="198" cy="181" r="89"/>
+  <circle cx="198" cy="181" r="66"/>
+  <path d="M198 181 236 89M198 181 278 165M198 181 244 266M198 181 124 263M198 181 124 111"/>
+</g>
+<g filter="url(#glow)">
+  <circle cx="198" cy="181" r="39" fill="#2b1b0c" stroke="#f0b846" stroke-width="3"/>
+  <circle cx="198" cy="168" r="11" fill="#f1ba4c"/>
+  <path d="M179 202c3-17 10-25 19-25 10 0 17 8 20 25Z" fill="#f1ba4c"/>
+</g>
+<g>
+  <circle cx="238" cy="88" r="27" fill="#1d1209" stroke="#f3c567" stroke-width="3"/>
+  <circle cx="279" cy="165" r="24" fill="#1d1209" stroke="#e7ad42" stroke-width="3"/>
+  <circle cx="244" cy="268" r="27" fill="#1d1209" stroke="#f3c567" stroke-width="3"/>
+  <circle cx="123" cy="263" r="24" fill="#1d1209" stroke="#d99a36" stroke-width="3"/>
+  <circle cx="123" cy="111" r="24" fill="#1d1209" stroke="#e6aa3a" stroke-width="3"/>
+  <g>
+    <circle cx="238" cy="82" r="9" fill="url(#skin1)"/><path d="M219 108c2-16 9-22 19-22s17 6 19 22Z" fill="#704127"/><path d="M228 76c5-12 21-11 24 2-7-5-16-6-24-2Z" fill="#1e120b"/>
+    <circle cx="279" cy="160" r="8" fill="url(#skin2)"/><path d="M262 184c2-13 8-19 17-19s15 6 17 19Z" fill="#8b5636"/><path d="M268 155c5-9 17-9 22 0-7-3-15-3-22 0Z" fill="#3a2116"/>
+    <circle cx="244" cy="262" r="9" fill="url(#skin1)"/><path d="M225 288c2-16 9-22 19-22s17 6 19 22Z" fill="#61402c"/><path d="M233 256c5-10 18-10 23-1-8-3-15-3-23 1Z" fill="#19120d"/>
+    <circle cx="123" cy="258" r="8" fill="url(#skin2)"/><path d="M106 282c2-13 8-19 17-19s15 6 17 19Z" fill="#7c4c31"/><path d="M112 253c4-9 16-9 22 0-7-3-15-3-22 0Z" fill="#302117"/>
+    <circle cx="123" cy="106" r="8" fill="url(#skin2)"/><path d="M106 130c2-13 8-19 17-19s15 6 17 19Z" fill="#5e3d28"/><path d="M112 101c5-9 16-9 22 0-7-3-15-3-22 0Z" fill="#25160f"/>
+  </g>
+</g>
+<g filter="url(#glow)">
+  <path d="M151 64c5-9 18-4 18 6 0 8-18 20-18 20s-18-12-18-20c0-10 13-15 18-6Z" fill="#e8ae39"/>
+  <rect x="267" y="221" width="34" height="31" rx="9" fill="#211409" stroke="#efb54a"/>
+  <path d="M274 229h19v11h-11l-6 6v-6h-2Z" stroke="#f2c66d" stroke-width="2" fill="none"/>
+  <rect x="96" y="166" width="32" height="31" rx="9" fill="#211409" stroke="#d69a34"/>
+  <path d="M105 174h14v15h-14Z" stroke="#f0c269" stroke-width="2" fill="none"/>
+</g>
+</svg>

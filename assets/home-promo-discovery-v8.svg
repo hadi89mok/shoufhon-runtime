@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 360">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#171008"/><stop offset=".58" stop-color="#090604"/><stop offset="1" stop-color="#030303"/></linearGradient>
+  <linearGradient id="map" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5a3a16"/><stop offset=".45" stop-color="#21150a"/><stop offset="1" stop-color="#080604"/></linearGradient>
+  <linearGradient id="pin" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe08a"/><stop offset=".45" stop-color="#f0b844"/><stop offset="1" stop-color="#b66e18"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="320" height="360" fill="url(#bg)"/>
+<g transform="translate(45 46)">
+  <path d="M30 42 247 10v236L31 288Z" fill="url(#map)" stroke="#644118"/>
+  <g stroke="#bd7b27" stroke-opacity=".26" fill="none">
+    <path d="M39 63 239 32M37 96 239 65M35 129 239 98M34 162 239 131M33 195 239 164M32 228 238 197M31 261 238 230"/>
+    <path d="M65 37 62 281M101 32 98 276M137 27 134 270M173 21 170 265M209 16 206 259"/>
+  </g>
+  <path d="M42 235c48-11 63-43 99-54 42-13 69-5 99-34" stroke="#f6bf4c" stroke-width="5" fill="none" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M50 254c52-7 76-31 108-36 37-6 55 3 78-17" stroke="#a65d14" stroke-width="3" fill="none" opacity=".7"/>
+  <g transform="translate(111 64)" filter="url(#glow)">
+    <path d="M54 0C25 0 2 23 2 52c0 41 52 103 52 103s52-62 52-103C106 23 83 0 54 0Z" fill="url(#pin)" stroke="#fff0ae" stroke-width="2"/>
+    <circle cx="54" cy="51" r="19" fill="#47290d"/>
+  </g>
+  <g fill="#201309" stroke="#bd7b27">
+    <rect x="41" y="215" width="31" height="27" rx="4"/>
+    <rect x="204" y="92" width="31" height="27" rx="4"/>
+    <rect x="82" y="263" width="34" height="25" rx="4"/>
+  </g>
+  <g stroke="#efb94b" stroke-width="2.2" fill="none">
+    <path d="M47 221h19l-3-7H50l-3 7Zm3 0v14h13v-14"/>
+    <path d="M210 98h19l-3-7h-13l-3 7Zm3 0v14h13V98"/>
+  </g>
+  <g transform="translate(58 14)">
+    <rect width="76" height="25" rx="12.5" fill="#2b1c0d" stroke="#a96b20"/>
+    <circle cx="15" cy="12.5" r="5" fill="none" stroke="#f5c45f" stroke-width="2"/>
+    <path d="m19 17 5 5" stroke="#f5c45f" stroke-width="2"/>
+    <rect x="31" y="8" width="29" height="3" rx="1.5" fill="#eab84a" opacity=".7"/>
+    <rect x="31" y="14" width="19" height="3" rx="1.5" fill="#8b5c28"/>
+  </g>
+</g>
+</svg>
