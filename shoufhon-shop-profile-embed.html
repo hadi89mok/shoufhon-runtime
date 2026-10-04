@@ -25,9 +25,9 @@
 
 <!-- SHOUFHON — OFFSCREEN EMBED SLEEP + SHARED PUBLIC PROFILE CACHE V2 (SDK-backed) -->
 <style id="shoufhon-embed-sleep-v1">
-html.m7-embed-suspended *,
-html.m7-embed-suspended *::before,
-html.m7-embed-suspended *::after{
+html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):not(#shoufhon-pause-guard) *,
+html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):not(#shoufhon-pause-guard) *::before,
+html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):not(#shoufhon-pause-guard) *::after{
   animation-play-state:paused!important;
   -webkit-animation-play-state:paused!important;
 }
@@ -9861,7 +9861,7 @@ body{
 
 @media(prefers-reduced-motion:reduce){
   #ma7alak-follow-embed .ma7alak-profile-stats{
-    animation:none!important;
+    
   }
 }
 
