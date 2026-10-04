@@ -7815,278 +7815,96 @@ body{
   }
 
 
-  function releasePreviewSource(
-    video
-  ){
+  // Decode stills one at a time. Never keep multiple gallery videos playing.
+  const previewPrimeQueue = [];
+  let previewPrimeActive = null;
+  let previewPrimeRetryTimer = null;
 
-    if(!video){
-      return;
-    }
+  function previewCanRun(video){
+    return video?.isConnected && visiblePreviewVideos.has(video) &&
+      !viewerOpen && !document.hidden && window.ShoufHonEmbedVisibility?.visible !== false;
+  }
 
-    /*
-       IMPORTANT — do not unload gallery-card media when it leaves the
-       viewport. Removing src + calling load() made an already-rendered
-       thumbnail turn black until another scroll caused the source to be
-       attached and decoded again.
-
-       Battery/heat protection is preserved by pausing here. The decoded
-       frame and source stay attached so the thumbnail remains visible.
-       Fullscreen viewer cleanup uses its own viewerVideo element below and
-       is intentionally unchanged.
-    */
+  function releasePreviewSource(video){
+    if(!video)return;
+    const index=previewPrimeQueue.indexOf(video);
+    if(index>=0)previewPrimeQueue.splice(index,1);
+    if(previewPrimeActive?.video===video)previewPrimeActive.cancel();
+    else delete video.dataset.m7PrimePending;
     pausePreview(video);
-
-    try{
-      video.preload =
-        "metadata";
-    }
-    catch(_){}
-
-    delete video.dataset.m7PrimePending;
-
+    // Keep the decoded still and attached source when leaving the viewport.
+    try{video.preload="metadata"}catch(_){}
   }
 
-
-  function primePreviewFrame(
-    video
-  ){
-
-    if(
-      !video ||
-      video.dataset.m7FramePrimed ===
-        "1" ||
-      video.dataset.m7PrimePending ===
-        "1"
-    ){
-      return;
-    }
-
-
-    video.dataset.m7PrimePending =
-      "1";
-
-    /*
-       preload="metadata" is enough for duration, but on some phone/desktop
-       browsers it does NOT decode pixels. That leaves a visible secondary
-       video card black until scrolling makes it the one active preview.
-
-       For a visible still preview only, temporarily allow enough buffering
-       to decode ONE muted frame, then pause immediately. This keeps the
-       one-moving-preview battery rule intact.
-    */
-    try{
-      video.preload =
-        "auto";
-    }
-    catch(_){}
-
-
-    ensurePreviewSource(
-      video
-    );
-
-
-    let finished =
-      false;
-
-    let fallbackTimer =
-      null;
-
-
-    const finish =
-      function(){
-
-        if(finished){
-          return;
-        }
-
-        finished =
-          true;
-
-        clearTimeout(
-          fallbackTimer
-        );
-
-        delete video.dataset.m7PrimePending;
-
-        try{
-          video.preload =
-            "metadata";
-        }
-        catch(_){}
-
-
-        if(
-          !visiblePreviewVideos.has(video) ||
-          viewerOpen ||
-          document.hidden ||
-          window.ShoufHonEmbedVisibility?.visible === false
-        ){
-          pausePreview(
-            video
-          );
-
-          return;
-        }
-
-
-        pausePreview(
-          video
-        );
-
-        video.dataset.m7FramePrimed =
-          "1";
-
-      };
-
-
-    const decodeOneFrame =
-      function(){
-
-        if(
-          finished ||
-          !visiblePreviewVideos.has(video) ||
-          viewerOpen ||
-          document.hidden ||
-          window.ShoufHonEmbedVisibility?.visible === false
-        ){
-          finish();
-          return;
-        }
-
-
-        try{
-
-          const promise =
-            video.play();
-
-
-          if(
-            promise &&
-            typeof promise.then ===
-              "function"
-          ){
-
-            promise
-              .then(
-                function(){
-
-                  if(
-                    typeof video.requestVideoFrameCallback ===
-                      "function"
-                  ){
-
-                    video.requestVideoFrameCallback(
-                      function(){
-                        finish();
-                      }
-                    );
-
-                    fallbackTimer =
-                      setTimeout(
-                        finish,
-                        180
-                      );
-
-                  }
-                  else{
-
-                    fallbackTimer =
-                      setTimeout(
-                        finish,
-                        90
-                      );
-
-                  }
-
-                }
-              )
-              .catch(
-                function(){
-
-                  /*
-                     If autoplay is blocked even though this preview is muted,
-                     loadeddata/canplay can still expose the decoded first frame.
-                  */
-                  if(video.readyState >= 2){
-                    finish();
-                  }
-                  else{
-                    fallbackTimer =
-                      setTimeout(
-                        finish,
-                        220
-                      );
-                  }
-
-                }
-              );
-
-            return;
-
-          }
-
-        }
-        catch(_){}
-
-
-        fallbackTimer =
-          setTimeout(
-            finish,
-            100
-          );
-
-      };
-
-
-    if(video.readyState >= 2){
-
-      decodeOneFrame();
-      return;
-
-    }
-
-
-    const onReady =
-      function(){
-
-        video.removeEventListener(
-          "loadeddata",
-          onReady
-        );
-
-        video.removeEventListener(
-          "canplay",
-          onReady
-        );
-
-        decodeOneFrame();
-
-      };
-
-
-    video.addEventListener(
-      "loadeddata",
-      onReady,
-      {once:true}
-    );
-
-    video.addEventListener(
-      "canplay",
-      onReady,
-      {once:true}
-    );
-
-
-    /*
-       Starting muted playback is what forces browsers that honor only
-       metadata preloading to actually decode the first video frame.
-       finish() pauses it immediately after that first frame is painted.
-    */
-    decodeOneFrame();
-
+  function primePreviewFrame(video){
+    if(!previewCanRun(video) || video.dataset.m7FramePrimed==="1" ||
+       video.dataset.m7PrimePending==="1" || Date.now()<Number(video.dataset.m7PrimeRetryAt||0) || Number(video.dataset.m7PrimeAttempts||0)>=2)return;
+    video.dataset.m7PrimePending="1";
+    previewPrimeQueue.push(video);
   }
 
+  function drainPreviewPrimeQueue(){
+    if(previewPrimeActive)return;
+    let video;
+    while(previewPrimeQueue.length){
+      const candidate=previewPrimeQueue.shift();
+      if(previewCanRun(candidate)){video=candidate;break}
+      delete candidate.dataset.m7PrimePending;
+    }
+    if(!video)return;
+    preparePreviewVideo(video);
+    video.dataset.m7PrimeAttempts=String(Number(video.dataset.m7PrimeAttempts||0)+1);
+    let done=false,timeout=null,paintTimer=null,frameCallback=null;
+    const cleanup=()=>{
+      clearTimeout(timeout);clearTimeout(paintTimer);
+      video.removeEventListener("loadeddata",onPixels);
+      video.removeEventListener("canplay",onPixels);
+      video.removeEventListener("error",onError);
+      if(frameCallback!==null)try{video.cancelVideoFrameCallback?.(frameCallback)}catch(_){}
+    };
+    const finish=(success,cancelled=false)=>{
+      if(done)return;
+      done=true;cleanup();pausePreview(video);
+      try{video.preload="metadata"}catch(_){}
+      delete video.dataset.m7PrimePending;
+      if(success)video.dataset.m7FramePrimed="1";
+      if(cancelled)video.dataset.m7PrimeAttempts=String(Math.max(0,Number(video.dataset.m7PrimeAttempts||0)-1));
+      previewPrimeActive=null;
+      // A timeout/error never counts as a decoded frame. Retry once without a scroll.
+      if(!success&&!cancelled&&previewCanRun(video)&&Number(video.dataset.m7PrimeAttempts)<2){
+        video.dataset.m7PrimeRetryAt=String(Date.now()+1000);
+        clearTimeout(previewPrimeRetryTimer);
+        previewPrimeRetryTimer=setTimeout(()=>{
+          previewPrimeRetryTimer=null;
+          if(previewCanRun(video)){primePreviewFrame(video);syncPreviewPlayback()}
+        },1000);
+      }
+      Promise.resolve().then(syncPreviewPlayback);
+    };
+    const onError=()=>finish(false);
+    const onPixels=()=>{
+      if(done||video.readyState<2)return;
+      if(!previewCanRun(video)){finish(false,true);return}
+      // Let the decoded frame paint even when muted autoplay is denied.
+      if(paintTimer===null)paintTimer=setTimeout(()=>finish(video.readyState>=2),120);
+    };
+    previewPrimeActive={video,cancel:()=>finish(false,true)};
+    video.addEventListener("loadeddata",onPixels);
+    video.addEventListener("canplay",onPixels);
+    video.addEventListener("error",onError);
+    try{video.preload="auto"}catch(_){}
+    ensurePreviewSource(video);
+    if(done)return;
+    timeout=setTimeout(()=>finish(video.readyState>=2),8000);
+    if(typeof video.requestVideoFrameCallback==="function"){
+      frameCallback=video.requestVideoFrameCallback(()=>finish(true));
+    }
+    try{
+      const promise=video.play();
+      promise?.then(()=>onPixels()).catch(()=>onPixels());
+    }catch(_){onPixels()}
+    onPixels();
+  }
 
   function ensurePreviewSource(
     video
@@ -8194,130 +8012,27 @@ body{
 
 
   function syncPreviewPlayback(){
-
-    const all =
-      Array.from(
-        root.querySelectorAll(
-          "[data-preview-video]"
-        )
-      );
-
-
-    if(
-      viewerOpen ||
-      document.hidden ||
-      window.ShoufHonEmbedVisibility?.visible === false
-    ){
-
-      all.forEach(
-        releasePreviewSource
-      );
-
+    const all=Array.from(root.querySelectorAll("[data-preview-video]"));
+    if(viewerOpen || document.hidden || window.ShoufHonEmbedVisibility?.visible===false){
+      clearTimeout(previewPrimeRetryTimer);previewPrimeRetryTimer=null;
+      all.forEach(releasePreviewSource);
       return;
     }
-
-
-    const visible =
-      all
-        .filter(
-          function(video){
-
-            return visiblePreviewVideos
-              .has(video);
-
-          }
-        )
-        .sort(
-          function(a,b){
-
-            return (
-              a.getBoundingClientRect()
-                .top -
-              b.getBoundingClientRect()
-                .top
-            );
-
-          }
-        );
-
-
-    /* Page Motion = Off disables animation, not thumbnails. Decode only
-       the first frame of at most two visible videos; never autoplay them. */
-    if(root.classList.contains("m7-media-static") || navigator.connection?.saveData===true || window.matchMedia?.("(prefers-reduced-motion: reduce)").matches){
-      const stills = new Set(visible.slice(0,2));
-      all.forEach(function(video){
-        if(stills.has(video)){
-          ensurePreviewSource(video);
-
-          /*
-             Do NOT pause immediately after starting the one-frame primer.
-             primePreviewFrame() pauses itself only after the browser has
-             actually painted a decoded frame.
-          */
-          primePreviewFrame(video);
-        }else{
-          releasePreviewSource(video);
-        }
-      });
-      return;
-    }
-
-    /*
-      Keep at most one moving preview.
-      This is intentionally strict for phone heat/performance.
-    */
-    const allowed =
-      new Set(
-        visible.slice(
-          0,
-          1
-        )
-      );
-
-
-    all.forEach(
-      function(video){
-
-        if(
-          allowed.has(video)
-        ){
-          playPreview(
-            video
-          );
-        }
-        else if(
-          visiblePreviewVideos.has(video)
-        ){
-          /*
-             Keep a real first frame visible for secondary cards without
-             letting them continuously decode/play. Removing src here made
-             visible video tiles render as black boxes on phones.
-          */
-          ensurePreviewSource(
-            video
-          );
-
-          /*
-             Let the primer finish decoding/painting one real frame.
-             It calls pausePreview() itself after requestVideoFrameCallback
-             (or its fallback) fires. Pausing here was cancelling decoding
-             early and leaving the visible card black.
-          */
-          primePreviewFrame(
-            video
-          );
-        }
-        else{
-          releasePreviewSource(
-            video
-          );
-        }
-
-      }
-    );
-
+    const visible=all.filter(video=>visiblePreviewVideos.has(video))
+      .sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);
+    const staticMode=root.classList.contains("m7-media-static") ||
+      navigator.connection?.saveData===true ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    // Static mode still prepares ALL nearby thumbnails, with one decoder at a time.
+    visible.forEach(video=>{ensurePreviewSource(video);primePreviewFrame(video)});
+    all.forEach(video=>{
+      if(!visiblePreviewVideos.has(video)){releasePreviewSource(video);return}
+      if(previewPrimeActive?.video===video)return;
+      if(!staticMode&&!previewPrimeActive&&!previewPrimeQueue.length&&video===visible[0])playPreview(video);
+      else pausePreview(video);
+    });
+    drainPreviewPrimeQueue();
   }
-
 
   function disconnectPreviewObserver(){
 
@@ -8375,34 +8090,11 @@ body{
     );
 
 
-    if(
-      !(
-        "IntersectionObserver"
-        in window
-      )
-    ){
-
-      videos
-        .slice(
-          0,
-          1
-        )
-        .forEach(
-          function(video){
-
-            visiblePreviewVideos.add(
-              video
-            );
-
-          }
-        );
-
-
+    if(!("IntersectionObserver" in window)){
+      videos.forEach(video=>visiblePreviewVideos.add(video));
       syncPreviewPlayback();
-
       return;
     }
-
 
     previewObserver =
       new IntersectionObserver(
