@@ -14340,6 +14340,7 @@ html,body{
   --m7-shop-arabic-scale:1;
   --m7-profile-action-font:inherit;
   --m7-profile-action-scale:1;
+  --m7-profile-social-offset-y:0px;
 
   padding:var(--m7-profile-shell-padding)!important;
   border-radius:var(--m7-profile-shell-radius)!important;
@@ -14388,6 +14389,11 @@ html,body{
 #ma7alak-profile-shell #ma7alak-follow-embed .ma7alak-follow-btn-text,
 #ma7alak-profile-shell #ma7alak-follow-embed .ma7alak-message-text{
   font-size:calc(14px * var(--m7-profile-action-scale))!important;
+}
+
+/* Change layout spacing, so the enclosing frame follows the group. */
+#ma7alak-profile-shell #ma7alak-follow-embed{
+  margin-top:var(--m7-profile-social-offset-y,0px)!important;
 }
 
 /* Restore Studio-controlled stats card instead of the retired transparent V4 mockup. */
@@ -14499,6 +14505,7 @@ html,body{
     shell.style.setProperty("--m7-profile-banner-position-x",bannerX+"%");
     shell.style.setProperty("--m7-profile-logo-shift-x",shiftX+"px");
     shell.style.setProperty("--m7-profile-logo-shift-y",shiftY+"px");
+    shell.style.setProperty("--m7-profile-social-offset-y",clamp(options.profile_social_offset_y,-100,140,0)+"px");
 
     shell.style.setProperty("--m7-shop-name-font",fontStack(options.shop_name_font_style));
     shell.style.setProperty("--m7-shop-category-font",fontStack(options.shop_category_font_style));
