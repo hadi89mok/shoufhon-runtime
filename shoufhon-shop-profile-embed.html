@@ -14327,6 +14327,16 @@ html,body{
      - restores Profile/Banner/Frame controls exposed by Admin Studio
      - keeps phone layout driven by Studio values instead of hard-coded V4 values
 ========================================================= -->
+<style id="m7-hiba-profile-no-shadow-boxes">
+html body #ma7alak-profile-shell[data-shop-slug="hiba-shop"],
+html body #ma7alak-profile-shell[data-shop-slug="hiba-shop"] #ma7alak-profile-banner,
+html body #ma7alak-profile-shell[data-shop-slug="hiba-shop"] #ma7alak-follow-embed .ma7alak-profile-stats{
+  box-shadow:none!important;
+  -webkit-box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+</style>
 <style id="m7-profile-studio-compat-20260927">
 #ma7alak-profile-shell{
   --m7-profile-banner-position-x:50%;

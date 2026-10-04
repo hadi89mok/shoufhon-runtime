@@ -3282,6 +3282,8 @@ body{
       "m7-media-showcase"
     );
 
+  root?.setAttribute("data-shop-slug",SHOP_SLUG);
+
   const loading =
     document.getElementById(
       "m7-media-loading"
@@ -15096,6 +15098,16 @@ function whatsappNumber(raw){
 <!-- Gallery preview controller is intentionally inline and authoritative.
      Do NOT add shoufhon-gallery-video-preview.js here; one controller avoids duplicate observers/listeners. -->
 <!-- Hiba: actual photo/video frame controls; header accent stays independent. -->
+<style id="m7-hiba-media-no-shadow-boxes">
+html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-head,
+html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-card,
+html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-hero-card{
+  box-shadow:none!important;
+  -webkit-box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+</style>
 <style id="m7-hiba-actual-media-frame-controls">
 #m7-media-showcase.m7-gallery-frame-current .m7-media-card.photo,
 #m7-media-showcase.m7-gallery-frame-current .m7-media-hero-card.photo{
