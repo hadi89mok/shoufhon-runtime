@@ -14941,3 +14941,69 @@ html,body{
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-profile-identity-effects.js"></script>
 
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-profile-frame-name.js"></script>
+
+
+<!-- Saved image crop: percentages follow responsive frames; CSS only, no polling. -->
+<style id="shoufhon-profile-image-crop-css">
+html body #ma7alak-profile-shell #ma7alak-profile-banner[data-image-crop]::before{
+  content:""!important;display:block!important;position:absolute!important;
+  inset:auto!important;left:var(--m7-banner-crop-left,0%)!important;top:var(--m7-banner-crop-top,0%)!important;
+  width:var(--m7-banner-crop-size,100%)!important;height:var(--m7-banner-crop-size,100%)!important;
+  background-image:var(--m7-banner-crop-image,none)!important;background-color:transparent!important;
+  background-size:cover!important;background-repeat:no-repeat!important;
+  background-position:var(--m7-banner-crop-x,50%) var(--m7-banner-crop-y,50%)!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  transform:none!important;animation:none!important;-webkit-animation:none!important;
+  filter:none!important;opacity:1!important;z-index:0!important;pointer-events:none!important;
+}
+html body #ma7alak-profile-shell #ma7alak-story-preview{position:relative!important;overflow:hidden!important}
+html body #ma7alak-profile-shell #ma7alak-story-preview img{
+  position:absolute!important;inset:auto!important;
+  left:var(--m7-logo-crop-left,0%)!important;top:var(--m7-logo-crop-top,0%)!important;
+  width:var(--m7-logo-crop-size,100%)!important;height:var(--m7-logo-crop-size,100%)!important;
+  max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;
+  object-fit:cover!important;object-position:var(--m7-logo-crop-x,50%) var(--m7-logo-crop-y,50%)!important;
+}
+</style>
+<script id="shoufhon-profile-image-crop-runtime">
+(function(){
+  "use strict";
+  const shell=document.getElementById("ma7alak-profile-shell");if(!shell)return;
+  let options={},queued=false;
+  const clamp=(value,min,max,fallback)=>value===undefined||value===null||value===""?fallback:Number.isFinite(Number(value))?Math.max(min,Math.min(max,Number(value))):fallback;
+  function crop(prefix,zoom,x,y){
+    shell.style.setProperty(prefix+"-size",zoom+"%");
+    shell.style.setProperty(prefix+"-left",((100-zoom)*x/100)+"%");
+    shell.style.setProperty(prefix+"-top",((100-zoom)*y/100)+"%");
+    shell.style.setProperty(prefix+"-x",x+"%");shell.style.setProperty(prefix+"-y",y+"%");
+  }
+  function apply(o){
+    if(!o||typeof o!=="object"||Array.isArray(o))return;options=o;
+    crop("--m7-banner-crop",clamp(o.profile_banner_zoom,100,300,100),clamp(o.profile_banner_position_x,0,100,50),clamp(o.profile_banner_position_y,0,100,50));
+    crop("--m7-logo-crop",clamp(o.profile_logo_image_zoom,100,300,100),clamp(o.profile_logo_image_position_x,0,100,50),clamp(o.profile_logo_image_position_y,0,100,50));
+    const banner=document.getElementById("ma7alak-profile-banner");
+    if(banner){
+      const raw=String(o.profile_banner_image_url||"").trim();
+      const url=/^https?:\/\//i.test(raw)?raw.replace(/\\/g,"%5C").replace(/"/g,"%22").replace(/[\r\n]/g,""):"";
+      shell.style.setProperty("--m7-banner-crop-image",url?'url("'+url+'")':"none");
+      banner.dataset.imageCrop="1";
+      banner.style.setProperty("background-image","none","important");
+    }
+  }
+  function schedule(next){
+    if(next&&typeof next==="object"&&!Array.isArray(next))options=next;
+    if(queued)return;queued=true;
+    Promise.resolve().then(()=>{queued=false;if(typeof document!=="undefined"&&shell.isConnected)apply(options)});
+  }
+  const receive=e=>{const d=e.detail||{};if(d.directory_options||d.profile?.directory_options)schedule(d.directory_options||d.profile.directory_options)};
+  for(const name of ["ma7alak:profile-design-preview","ma7alak:profile-design-saved","ma7alak:profile-draft-preview","shoufhon:design-preview"])window.addEventListener(name,receive);
+  window.addEventListener("message",e=>{
+    if(e.source!==window.parent&&e.source!==window.top)return;
+    const d=e.data||{};if(["MA7ALAK_DESIGN_PREVIEW","MA7ALAK_PROFILE_STATE","MA7ALAK_PROFILE_UPDATED"].includes(d.type))schedule(d.directory_options||d.profile?.directory_options);
+  });
+  window.addEventListener("resize",()=>schedule(),{passive:true});
+  window.addEventListener("pageshow",()=>schedule());
+  window.ShoufHonProfileImageCrop={apply};
+  schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
+})();
+</script>
