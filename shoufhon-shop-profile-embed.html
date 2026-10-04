@@ -14484,7 +14484,7 @@ html body #ma7alak-profile-shell[data-shop-slug="hiba-shop"] #ma7alak-follow-emb
     )*scale+"px");
   }
   function applyExtraAnimation(el,mode){
-    if(!el||el.id==="ma7alak-shop-name"&&window.ShoufHonProfileFrameName)return;
+    if(!el||el.id==="ma7alak-shop-name"&&window.ShoufHonProfileFrameName||el.id==="ma7alak-shop-arabic-name"&&window.ShoufHonIdentityEffects)return;
     const m=String(mode||"").trim().toLowerCase();
     const custom={
       float:"m7StudioTextFloat 3.2s ease-in-out infinite",
