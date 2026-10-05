@@ -6582,7 +6582,10 @@ body{
   }
 
 
+  function mediaSectionAwake(){return !document.hidden&&window.ShoufHonEmbedVisibility?.visible!==false;}
+
   function scheduleSocialRefresh(){
+    if(!mediaSectionAwake())return;
 
     clearTimeout(
       socialRefreshTimer
@@ -6591,6 +6594,7 @@ body{
     socialRefreshTimer =
       setTimeout(
         async function(){
+          if(!mediaSectionAwake())return;
 
           await loadEngagementState();
 
@@ -8216,6 +8220,7 @@ body{
 
           wakeRefreshTimer =
             null;
+          if(!mediaSectionAwake())return;
 
           loadAll(
             false
@@ -8297,6 +8302,7 @@ body{
         return;
       }
 
+      scheduleWakeRefresh();
       syncPreviewPlayback();
 
     }
@@ -14258,6 +14264,7 @@ function whatsappNumber(raw){
   ========================================================= */
 
   function scheduleRefresh(){
+    if(!mediaSectionAwake())return;
 
     clearTimeout(
       refreshTimer
@@ -14267,6 +14274,7 @@ function whatsappNumber(raw){
     refreshTimer =
       setTimeout(
         function(){
+          if(!mediaSectionAwake())return;
 
           loadAll(
             true
@@ -14282,6 +14290,7 @@ function whatsappNumber(raw){
   function applyProfileRealtime(
     payload
   ){
+    if(!mediaSectionAwake())return;
 
     const nextOptions =
       payload &&

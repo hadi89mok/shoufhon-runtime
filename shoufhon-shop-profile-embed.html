@@ -6202,6 +6202,7 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
   // Shared renderers own the label, name, surface and frame for every shop.
   function applyPageDesignFromAdmin(profile){
     const options=profile?.directory_options||{};
+    window.ShoufHonProfileBannerApply?.(options);
     window.ShoufHonIdentityEffects?.apply(options);
     window.ShoufHonProfileFrameName?.apply(options);
     m7dsApplyTypography(document.getElementById("ma7alak-profile-shell")||document.body,options,"profile");
@@ -13639,8 +13640,21 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
       const raw=String(o.profile_banner_image_url||"").trim();
       const url=/^https?:\/\//i.test(raw)?raw.replace(/\\/g,"%5C").replace(/"/g,"%22").replace(/[\r\n]/g,""):"";
       shell.style.setProperty("--m7-banner-crop-image",url?'url("'+url+'")':"none");
-      banner.dataset.imageCrop="1";
-      banner.style.setProperty("background-image","none","important");
+      const enabled=o.profile_banner_enabled!==false&&String(o.profile_banner_enabled||"").toLowerCase()!=="false";
+      const styleName=String(o.profile_banner_style||"rounded-fade").toLowerCase();
+      banner.classList.toggle("visible",Boolean(url)&&enabled);
+      banner.classList.toggle("m7-banner-straight",styleName==="straight");
+      banner.classList.toggle("m7-banner-rounded",styleName==="rounded");
+      banner.classList.toggle("m7-banner-wave",styleName==="wave");
+      banner.classList.toggle("m7-banner-fade",styleName==="fade");
+      banner.classList.toggle("m7-banner-rounded-fade",styleName==="rounded-fade");
+      if(url){
+        banner.dataset.imageCrop="1";
+        banner.style.setProperty("background-image","none","important");
+      }else{
+        banner.removeAttribute("data-image-crop");
+        banner.style.removeProperty("background-image");
+      }
     }
   }
   function schedule(next){
@@ -13649,6 +13663,7 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
     Promise.resolve().then(()=>{queued=false;if(typeof document!=="undefined"&&shell.isConnected)apply(options)});
   }
   const receive=e=>{const d=e.detail||{};if(d.directory_options||d.profile?.directory_options)schedule(d.directory_options||d.profile.directory_options)};
+  window.ShoufHonProfileBannerApply=apply;
   for(const name of ["ma7alak:profile-design-preview","ma7alak:profile-design-saved","ma7alak:profile-draft-preview","shoufhon:design-preview"])window.addEventListener(name,receive);
   window.addEventListener("message",e=>{
     if(e.source!==window.parent&&e.source!==window.top)return;
@@ -13660,4 +13675,3 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
   schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
 })();
 </script>
-
