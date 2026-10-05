@@ -9690,6 +9690,14 @@ body{
   display:none!important;
 }
 
+/* Never flash Follow/Message while owner identity is still resolving.
+   A positive owner state can resolve this immediately; otherwise the
+   authoritative owner bridge finishes first. */
+#ma7alak-follow-embed.owner-check-pending
+.ma7alak-follow-actions{
+  display:none!important;
+}
+
 
 #ma7alak-follow-embed.is-own-shop
 .ma7alak-follow-owner-badge{
@@ -9994,6 +10002,8 @@ const root =
 if(!root){
   return;
 }
+
+root.classList.add("owner-check-pending");
 
 
 /* =========================================================
@@ -11791,6 +11801,23 @@ async function checkOwnShop(){
     const h =
       host();
 
+    /* A cached/verified positive owner state is safe to use immediately and
+       prevents the self-Follow button from flashing during refresh. */
+    const immediateSlug=
+      h.Ma7alakOwnerAuth
+        ?.owner
+        ?.shop_slug;
+
+    if(
+      immediateSlug &&
+      String(immediateSlug)===SHOP_SLUG
+    ){
+      isOwnShop=true;
+      root.classList.add("is-own-shop");
+      root.classList.remove("owner-check-pending");
+      return true;
+    }
+
 
     if(
       h.Ma7alakOwnerAuth
@@ -11817,6 +11844,8 @@ async function checkOwnShop(){
       ) ===
       SHOP_SLUG;
 
+    root.classList.toggle("is-own-shop",isOwnShop);
+    root.classList.remove("owner-check-pending");
 
     return isOwnShop;
 
@@ -11828,6 +11857,7 @@ async function checkOwnShop(){
     isOwnShop =
       false;
 
+    root.classList.remove("owner-check-pending");
 
     return false;
 
@@ -12897,6 +12927,20 @@ window.addEventListener(
     const data =
       event?.data;
 
+    if(
+      data &&
+      data.type==="MA7ALAK_OWNER_STATE"
+    ){
+      const incomingSlug=String(data.shopSlug||data.shop_slug||"").trim();
+      if(data.isOwner===true && incomingSlug===SHOP_SLUG){
+        isOwnShop=true;
+        root.classList.add("is-own-shop");
+        root.classList.remove("owner-check-pending");
+        render();
+      }
+      return;
+    }
+
 
     if(
       !data ||
@@ -13188,6 +13232,13 @@ window
 /* =========================================================
    START
 ========================================================= */
+
+try{
+  const target=host();
+  if(target&&target!==window){
+    target.postMessage({type:"MA7ALAK_OWNER_STATE_GET",shopSlug:SHOP_SLUG,sentAt:Date.now()},"*");
+  }
+}catch(_){}
 
 checkOwnShop()
 
