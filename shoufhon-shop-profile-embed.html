@@ -5160,6 +5160,8 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
     }
 
     root.classList.add("ma7alak-identity-ready");
+    // Identity refreshes rebuild the base icon; restore the current Studio image.
+    window.ShoufHonIdentityEffects?.reapply();
   }
 
 
@@ -14770,3 +14772,4 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
   schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
 })();
 </script>
+
