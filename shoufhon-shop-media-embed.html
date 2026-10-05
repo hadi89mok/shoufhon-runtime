@@ -3633,6 +3633,9 @@ body{
   const engagementMap =
     new Map();
 
+  let engagementLoadPromise =
+    null;
+
   const mediaRpcPending =
     new Map();
 
@@ -6498,11 +6501,16 @@ body{
 
   async function loadEngagementState(){
 
+    if(engagementLoadPromise){
+      return engagementLoadPromise;
+    }
+
     if(!SHOP_SLUG){
       return;
     }
 
-    try{
+    engagementLoadPromise = (async function(){
+      try{
 
       const rows =
         await mediaRpc(
@@ -6569,14 +6577,22 @@ body{
 
       updateEngagementDom();
 
-    }
-    catch(error){
+      }
+      catch(error){
 
       console.warn(
         "[ShoufHon Media] engagement:",
         error
       );
 
+      }
+    })();
+
+    try{
+      await engagementLoadPromise;
+    }
+    finally{
+      engagementLoadPromise = null;
     }
 
   }
@@ -12111,6 +12127,7 @@ body{
 
   let mediaPreviewReady=false,mediaPreviewProbe=null;
   const mediaShareCache=new Map();
+  const whatsappContactCache=new Map();
   function mediaLegacyUrl(item){
     const u=new URL("https://shoufhon.com/"+encodeURIComponent(SHOP_SLUG));
     u.searchParams.set("media",item.type+":"+item.sourceId);return u.href;
@@ -12148,13 +12165,18 @@ function whatsappNumber(raw){
       url.searchParams.set("text","Hello, I'm reaching out regarding this "+(item.type==="video"?"video":"photo")+" on ShoufHon:\n"+mediaShareUrl(item));
       button.href=url.href;button.hidden=false;
     };
+    const cachedContact=whatsappContactCache.get(SHOP_SLUG);
+    if(cachedContact)sync({whatsapp_url:cachedContact});
     try{
       let cached=mediaShareCache.get(key);
       if(!cached||Date.now()-cached.at>60000){
         cached={at:Date.now(),promise:mediaRpc("shoufhon_get_media_share",{p_shop_slug:SHOP_SLUG,p_media_type:item.type,p_media_id:Number(item.sourceId)},{readOnly:true}).then(rows=>Array.isArray(rows)?rows[0]:rows)};
         mediaShareCache.set(key,cached);
       }
-      const row=await cached.promise;sync(row);
+      const row=await cached.promise;
+      const number=whatsappNumber(row?.whatsapp_url);
+      if(number)whatsappContactCache.set(SHOP_SLUG,number);
+      sync(row);
       probeMediaPreview().then(()=>sync(row));
     }catch(_){mediaShareCache.delete(key)}
   }
@@ -12195,6 +12217,12 @@ function whatsappNumber(raw){
 
 
     updateMediaShareActions(item);
+    syncViewerSocial();
+    if(!engagementMap.has(socialKey(item))){
+      loadEngagementState().then(function(){
+        if(viewerMedia[currentIndex]===item)syncViewerSocial();
+      }).catch(function(){});
+    }
     viewerAccent(
       item
     );
@@ -14871,4 +14899,3 @@ html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-hero-card{
 
 
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-online-status.js"></script>
-
