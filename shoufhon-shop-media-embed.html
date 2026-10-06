@@ -7881,10 +7881,14 @@ body{
   const previewPrimeQueue = [];
   let previewPrimeActive = null;
   let previewPrimeRetryTimer = null;
+  let previewCovered = false;
+  let mediaPageAway = false;
+  let viewerVisibilityPaused = false;
 
   function previewCanRun(video){
     return video?.isConnected && visiblePreviewVideos.has(video) &&
-      !viewerOpen && !document.hidden && window.ShoufHonEmbedVisibility?.visible !== false;
+      !viewerOpen && !previewCovered && !mediaPageAway && !document.hidden &&
+      !root.closest(".m7-native-offscreen") && window.ShoufHonEmbedVisibility?.visible !== false;
   }
 
   function releasePreviewSource(video){
@@ -8016,8 +8020,8 @@ body{
 
     if(
       !video ||
-      viewerOpen ||
-      document.hidden ||
+      viewerOpen || previewCovered || mediaPageAway ||
+      document.hidden || root.closest(".m7-native-offscreen") ||
       window.ShoufHonEmbedVisibility?.visible === false ||
       root.classList.contains(
         "m7-media-static"
@@ -8075,7 +8079,7 @@ body{
 
   function syncPreviewPlayback(){
     const all=Array.from(root.querySelectorAll("[data-preview-video]"));
-    if(viewerOpen || document.hidden || window.ShoufHonEmbedVisibility?.visible===false){
+    if(viewerOpen || previewCovered || mediaPageAway || document.hidden || root.closest(".m7-native-offscreen") || window.ShoufHonEmbedVisibility?.visible===false){
       clearTimeout(previewPrimeRetryTimer);previewPrimeRetryTimer=null;
       all.forEach(releasePreviewSource);
       return;
@@ -8262,9 +8266,16 @@ body{
       ){
 
         scheduleWakeRefresh();
+        if(viewerVisibilityPaused && viewerOpen && viewerVideo.getAttribute("src")){
+          viewerVisibilityPaused=false;
+          viewerVideo.play()?.catch(()=>{});
+        }
 
       }
       else{
+
+        viewerVisibilityPaused=viewerVisibilityPaused || (viewerOpen && !viewerVideo.paused);
+        try{viewerVideo.pause()}catch(_){}
 
         clearTimeout(
           wakeRefreshTimer
@@ -8324,6 +8335,26 @@ body{
     }
   );
 
+
+  // Reuse the shared viewport lifecycle; no observer or polling controller.
+  window.addEventListener("shoufhon:viewport-open",()=>{previewCovered=true;syncPreviewPlayback()});
+  window.addEventListener("shoufhon:viewport-close",()=>{previewCovered=false;syncPreviewPlayback()});
+  window.addEventListener("pagehide",()=>{
+    mediaPageAway=true;
+    clearTimeout(wakeRefreshTimer);
+    viewerVisibilityPaused=viewerVisibilityPaused || (viewerOpen && !viewerVideo.paused);
+    try{viewerVideo.pause()}catch(_){}
+    syncPreviewPlayback();
+  });
+  window.addEventListener("pageshow",()=>{
+    mediaPageAway=false;
+    if(!document.hidden){
+      if(viewerVisibilityPaused && viewerOpen && viewerVideo.getAttribute("src")){
+        viewerVisibilityPaused=false;viewerVideo.play()?.catch(()=>{});
+      }
+      syncPreviewPlayback();
+    }
+  });
 
   /* =========================================================
      FULLSCREEN VIEWER
@@ -12997,6 +13028,7 @@ function whatsappNumber(raw){
 
   function finishClose(){
 
+    viewerVisibilityPaused=false;
     viewerOpen =
       false;
 
@@ -14900,3 +14932,4 @@ html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-hero-card{
 
 
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-online-status.js"></script>
+
