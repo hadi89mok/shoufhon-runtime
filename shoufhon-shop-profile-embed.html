@@ -3800,8 +3800,7 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
       : "";
     const shellBorder=hex(options.profile_shell_border_color,accent);
     const bannerBorder=hex(options.profile_banner_border_color,shellBorder);
-    const statsBg=hex(options.profile_stats_bg_color,"#0d0b0a");
-    const statsBorder=hex(options.profile_stats_border_color,shellBorder);
+    const statsBorder=shellBorder;
     const statsNumber=hex(options.profile_stats_number_color,"#ffffff");
     const statsLabel=hex(options.profile_stats_label_color,"#bcb5ae");
     const followBg=hex(options.profile_follow_btn_bg_color,"#5a351a");
@@ -3839,7 +3838,6 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
     const bannerBorderWidth=clamp(options.profile_banner_border_width,0,4,1);
     const logoSize=clamp(options.profile_logo_size,120,270,210);
     const logoOverlap=clamp(options.profile_logo_overlap,0,130,62);
-    const statsRadius=clamp(options.profile_stats_radius,0,32,18);
 
     const storyEffectAllowed=["premium","glow","shimmer","sparkle","heartbeat","soft","radar","halo","comet","neon-wave","orbit-glint","double-pulse","none"];
     const storyEffectRaw=String(options.story_new_effect||"premium").trim().toLowerCase();
@@ -3928,9 +3926,7 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
     shell.style.setProperty("--m7-story-scale",String((1+storyIntensity*.080).toFixed(4)));
     shell.style.setProperty("--m7-story-scale-soft",String((1+storyIntensity*.035).toFixed(4)));
 
-    shell.style.setProperty("--m7-profile-stats-bg",statsBg);
     shell.style.setProperty("--m7-profile-stats-border",statsBorder);
-    shell.style.setProperty("--m7-profile-stats-radius",statsRadius+"px");
     shell.style.setProperty("--m7-profile-stats-number",statsNumber);
     shell.style.setProperty("--m7-profile-stats-label",statsLabel);
 
@@ -12254,9 +12250,7 @@ html,body{
   --m7-profile-banner-border-width:1px;
   --m7-profile-logo-size:210px;
   --m7-profile-logo-overlap:62px;
-  --m7-profile-stats-bg:#0d0b0a;
   --m7-profile-stats-border:#5d472f;
-  --m7-profile-stats-radius:18px;
   --m7-profile-stats-number:#fff;
   --m7-profile-stats-label:#bcb5ae;
   --m7-profile-follow-bg:#5a351a;
@@ -12611,12 +12605,10 @@ html,body{
 #ma7alak-profile-shell #ma7alak-follow-embed .ma7alak-profile-stats{
   width:100%!important;
   min-height:76px!important;
-  border:1px solid var(--m7-profile-stats-border)!important;
-  border-radius:var(--m7-profile-stats-radius)!important;
-  background:var(--m7-profile-stats-bg)!important;
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.22),
-    inset 0 1px 0 rgba(255,255,255,.035)!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
   backdrop-filter:none!important;
   -webkit-backdrop-filter:none!important;
 }
@@ -13348,13 +13340,13 @@ html body #ma7alak-profile-shell[data-shop-slug="hiba-shop"] #ma7alak-follow-emb
   margin-top:var(--m7-profile-social-offset-y,0px)!important;
 }
 
-/* Restore Studio-controlled stats card instead of the retired transparent V4 mockup. */
+/* Social stats blend into the shared profile frame. */
 #ma7alak-profile-shell #ma7alak-follow-embed .ma7alak-profile-stats{
   padding:6px 4px!important;
-  border:1px solid var(--m7-profile-stats-border)!important;
-  border-radius:var(--m7-profile-stats-radius)!important;
-  background:var(--m7-profile-stats-bg)!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
 }
 
 @keyframes m7StudioTextFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
