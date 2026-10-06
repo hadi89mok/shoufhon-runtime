@@ -12156,21 +12156,9 @@ body{
 
 
 
-  let mediaPreviewReady=false,mediaPreviewProbe=null;
   const mediaShareCache=new Map();
   const whatsappContactCache=new Map();
-  function mediaLegacyUrl(item){
-    const u=new URL("https://shoufhon.com/"+encodeURIComponent(SHOP_SLUG));
-    u.searchParams.set("media",item.type+":"+item.sourceId);return u.href;
-  }
-  function mediaShareUrl(item){return mediaPreviewReady
-    ?"https://shoufhon.com/reel-share/media/"+encodeURIComponent(SHOP_SLUG)+"/"+item.type+"/"+item.sourceId
-    :mediaLegacyUrl(item)}
-  function probeMediaPreview(){
-    if(!mediaPreviewProbe)mediaPreviewProbe=fetch("https://shoufhon.com/reel-share/_health",{method:"HEAD",signal:AbortSignal.timeout(3500)})
-      .then(r=>mediaPreviewReady=r.ok&&r.headers.get("X-ShoufHon-Media-Preview")==="1").catch(()=>false);
-    return mediaPreviewProbe;
-  }
+  function mediaShareUrl(item){return "https://shoufhon.com/reel-share/media/"+encodeURIComponent(SHOP_SLUG)+"/"+item.type+"/"+item.sourceId;}
 function whatsappNumber(raw){
   raw=String(raw||"").trim();
   if(/^https?:\/\//i.test(raw)){
@@ -12208,7 +12196,6 @@ function whatsappNumber(raw){
       const number=whatsappNumber(row?.whatsapp_url);
       if(number)whatsappContactCache.set(SHOP_SLUG,number);
       sync(row);
-      probeMediaPreview().then(()=>sync(row));
     }catch(_){mediaShareCache.delete(key)}
   }
   document.getElementById("m7v-share").addEventListener("click",()=>{
@@ -14932,4 +14919,5 @@ html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-hero-card{
 
 
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-online-status.js"></script>
+
 
