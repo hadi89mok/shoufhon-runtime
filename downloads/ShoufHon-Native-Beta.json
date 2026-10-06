@@ -1,0 +1,8 @@
+{
+  "name": "ShoufHon Native Beta",
+  "package": "com.shoufhon.nativebeta",
+  "version": "0.1.0-native-beta.1",
+  "architecture": "Kotlin + Jetpack Compose + Media3; no WebView",
+  "source_commit": "7368091727fee550f7b10568ccf0f41d163ba686",
+  "download": "https://raw.githubusercontent.com/hadi89mok/shoufhon-runtime/main/downloads/ShoufHon-Native-Beta.apk"
+}
