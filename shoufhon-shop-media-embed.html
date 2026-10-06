@@ -12616,6 +12616,11 @@ function whatsappNumber(raw){
 
   async function enterViewport(){
 
+    if(window.ShoufHonNativeShopTest){
+      window.ShoufHonNativeShopUI?.openViewport("media-viewer");
+      return;
+    }
+
     /*
        SHOUFHON VIEWPORT MODE ONLY.
        Never request browser/native fullscreen here.
@@ -12714,14 +12719,10 @@ function whatsappNumber(raw){
     syncKeyboardViewport();
 
 
-    document.documentElement
-      .style.overflow =
-        "hidden";
-
-    document.body
-      .style.overflow =
-        "hidden";
-
+    if(!window.ShoufHonNativeShopTest){
+      document.documentElement.style.overflow="hidden";
+      document.body.style.overflow="hidden";
+    }
 
     await enterViewport();
 
@@ -12918,14 +12919,10 @@ function whatsappNumber(raw){
     );
 
 
-    document.documentElement
-      .style.overflow =
-        "hidden";
-
-    document.body
-      .style.overflow =
-        "hidden";
-
+    if(!window.ShoufHonNativeShopTest){
+      document.documentElement.style.overflow="hidden";
+      document.body.style.overflow="hidden";
+    }
 
     await enterViewport();
 
@@ -12975,7 +12972,7 @@ function whatsappNumber(raw){
       try{
         if(
           window.parent &&
-          window.parent !== window
+          (window.parent !== window || window.ShoufHonNativeShopTest)
         ){
           window.parent.postMessage(
             {
@@ -13062,6 +13059,10 @@ function whatsappNumber(raw){
 
 
   async function closeMedia(options={}){
+
+    if(window.ShoufHonNativeShopTest&&viewerOpen){
+      window.ShoufHonNativeShopUI?.closeViewport("media-viewer",options.fromPortalBack===true);
+    }
 
     if(
       !viewerOpen

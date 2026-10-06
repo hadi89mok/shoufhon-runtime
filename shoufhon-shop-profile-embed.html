@@ -6999,6 +6999,8 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
 
   function ownerPageTarget(){
 
+    if(window.ShoufHonNativeShopTest)return window;
+
     try{
       if(
         window.top &&
@@ -7254,7 +7256,7 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
             SHOP_SLUG,
 
           __ma7alakOpenStoryNow:
-            true
+            !window.ShoufHonNativeShopTest
 
         },
 
