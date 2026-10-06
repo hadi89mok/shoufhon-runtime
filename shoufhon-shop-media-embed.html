@@ -1035,54 +1035,54 @@ body{
 }
 
 @keyframes m7GalleryFramePulse{
-  0%,100%{filter:brightness(1);opacity:.72}
-  50%{filter:brightness(1.32);opacity:1}
+  0%,100%{opacity:.72;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.018)}
 }
 @-webkit-keyframes m7GalleryFramePulse{
-  0%,100%{-webkit-filter:brightness(1);opacity:.72}
-  50%{-webkit-filter:brightness(1.32);opacity:1}
+  0%,100%{opacity:.72;-webkit-transform:scale(1)}
+  50%{opacity:1;-webkit-transform:scale(1.018)}
 }
 @keyframes m7GalleryFrameWave{
-  0%,100%{filter:brightness(.90);opacity:.62}
-  45%,60%{filter:brightness(1.45);opacity:1}
+  0%,100%{opacity:.62;transform:scale(.996)}
+  45%,60%{opacity:1;transform:scale(1.014)}
 }
 @-webkit-keyframes m7GalleryFrameWave{
-  0%,100%{-webkit-filter:brightness(.90);opacity:.62}
-  45%,60%{-webkit-filter:brightness(1.45);opacity:1}
+  0%,100%{opacity:.62;-webkit-transform:scale(.996)}
+  45%,60%{opacity:1;-webkit-transform:scale(1.014)}
 }
 @keyframes m7GalleryFrameGlow{
-  0%,100%{opacity:.40;box-shadow:0 0 5px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 24%,transparent)}
-  50%{opacity:1;box-shadow:0 0 20px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 72%,transparent),0 0 30px color-mix(in srgb,var(--m7-gallery-frame-secondary,#f2d18d) 38%,transparent)}
+  0%,100%{opacity:.40;transform:scale(.992)}
+  50%{opacity:1;transform:scale(1.016)}
 }
 @-webkit-keyframes m7GalleryFrameGlow{
-  0%,100%{opacity:.40;box-shadow:0 0 5px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 24%,transparent)}
-  50%{opacity:1;box-shadow:0 0 20px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 72%,transparent),0 0 30px color-mix(in srgb,var(--m7-gallery-frame-secondary,#f2d18d) 38%,transparent)}
+  0%,100%{opacity:.40;-webkit-transform:scale(.992)}
+  50%{opacity:1;-webkit-transform:scale(1.016)}
 }
 @keyframes m7GalleryFrameShimmer{
-  0%,100%{opacity:.40;filter:brightness(.96)}
-  34%{opacity:1;filter:brightness(1.48)}
-  68%{opacity:.58;filter:brightness(1.10)}
+  0%,100%{opacity:.42;transform:translateX(-.6%) scale(.998)}
+  34%{opacity:1;transform:translateX(.35%) scale(1.01)}
+  68%{opacity:.60;transform:translateX(.7%) scale(1.002)}
 }
 @-webkit-keyframes m7GalleryFrameShimmer{
-  0%,100%{opacity:.40;-webkit-filter:brightness(.96)}
-  34%{opacity:1;-webkit-filter:brightness(1.48)}
-  68%{opacity:.58;-webkit-filter:brightness(1.10)}
+  0%,100%{opacity:.42;-webkit-transform:translateX(-.6%) scale(.998)}
+  34%{opacity:1;-webkit-transform:translateX(.35%) scale(1.01)}
+  68%{opacity:.60;-webkit-transform:translateX(.7%) scale(1.002)}
 }
 @keyframes m7GalleryFrameBreathe{
-  0%,100%{opacity:.50;box-shadow:0 0 7px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 25%,transparent)}
-  50%{opacity:.96;box-shadow:0 0 15px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 58%,transparent)}
+  0%,100%{opacity:.50;transform:scale(.992)}
+  50%{opacity:.96;transform:scale(1.014)}
 }
 @-webkit-keyframes m7GalleryFrameBreathe{
-  0%,100%{opacity:.50;box-shadow:0 0 7px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 25%,transparent)}
-  50%{opacity:.96;box-shadow:0 0 15px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 58%,transparent)}
+  0%,100%{opacity:.50;-webkit-transform:scale(.992)}
+  50%{opacity:.96;-webkit-transform:scale(1.014)}
 }
 @keyframes m7GalleryFrameFlicker{
-  0%,18%,22%,25%,53%,57%,100%{opacity:.90;filter:brightness(1.12)}
-  20%,24%,55%{opacity:.34;filter:brightness(.78)}
+  0%,18%,22%,25%,53%,57%,100%{opacity:.90}
+  20%,24%,55%{opacity:.34}
 }
 @-webkit-keyframes m7GalleryFrameFlicker{
-  0%,18%,22%,25%,53%,57%,100%{opacity:.90;-webkit-filter:brightness(1.12)}
-  20%,24%,55%{opacity:.34;-webkit-filter:brightness(.78)}
+  0%,18%,22%,25%,53%,57%,100%{opacity:.90}
+  20%,24%,55%{opacity:.34}
 }
 
 /* Animation aura for every photo frame style, without moving the image itself. */
@@ -1096,7 +1096,7 @@ body{
   border-radius:inherit;
   opacity:0;
   box-shadow:0 0 0 transparent;
-  will-change:opacity,filter,box-shadow;
+  will-change:opacity,transform;
 }
 
 /* Non-layer frames need a real visible ring to animate. Previously pulse/wave/
@@ -1127,6 +1127,7 @@ body{
 #m7-media-showcase.m7-frame-anim-glow .photo::after{
   animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
+  box-shadow:0 0 18px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 58%,transparent);
 }
 #m7-media-showcase.m7-frame-anim-shimmer .photo::after{
   animation:m7GalleryFrameShimmer var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
@@ -1136,6 +1137,7 @@ body{
 #m7-media-showcase.m7-frame-anim-breathe .photo::after{
   animation:m7GalleryFrameBreathe var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7GalleryFrameBreathe var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
+  box-shadow:0 0 14px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 46%,transparent);
 }
 #m7-media-showcase.m7-frame-anim-flicker .photo::after{
   animation:m7GalleryFrameFlicker var(--m7-gallery-frame-speed,3.2s) linear infinite;
@@ -1147,12 +1149,12 @@ body{
 #m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-pulse .photo .m7-media-frame-layer{
   animation:m7GalleryFramePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7GalleryFramePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
-  will-change:filter,opacity;
+  will-change:transform,opacity;
 }
 #m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-wave .photo .m7-media-frame-layer{
   animation:m7GalleryFrameWave var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7GalleryFrameWave var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
-  will-change:filter,opacity;
+  will-change:transform,opacity;
 }
 #m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-glow .photo .m7-media-frame-layer{
   animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite;
@@ -1315,54 +1317,54 @@ body{
 }
 
 @keyframes m7VideoFramePulse{
-  0%,100%{filter:brightness(1);opacity:.72}
-  50%{filter:brightness(1.32);opacity:1}
+  0%,100%{opacity:.72;transform:scale(1)}
+  50%{opacity:1;transform:scale(1.018)}
 }
 @-webkit-keyframes m7VideoFramePulse{
-  0%,100%{-webkit-filter:brightness(1);opacity:.72}
-  50%{-webkit-filter:brightness(1.32);opacity:1}
+  0%,100%{opacity:.72;-webkit-transform:scale(1)}
+  50%{opacity:1;-webkit-transform:scale(1.018)}
 }
 @keyframes m7VideoFrameWave{
-  0%,100%{filter:brightness(.90);opacity:.62}
-  45%,60%{filter:brightness(1.45);opacity:1}
+  0%,100%{opacity:.62;transform:scale(.996)}
+  45%,60%{opacity:1;transform:scale(1.014)}
 }
 @-webkit-keyframes m7VideoFrameWave{
-  0%,100%{-webkit-filter:brightness(.90);opacity:.62}
-  45%,60%{-webkit-filter:brightness(1.45);opacity:1}
+  0%,100%{opacity:.62;-webkit-transform:scale(.996)}
+  45%,60%{opacity:1;-webkit-transform:scale(1.014)}
 }
 @keyframes m7VideoFrameGlow{
-  0%,100%{opacity:.40;box-shadow:0 0 5px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 24%,transparent)}
-  50%{opacity:1;box-shadow:0 0 20px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 72%,transparent),0 0 30px color-mix(in srgb,var(--m7-video-frame-secondary,#f2d18d) 38%,transparent)}
+  0%,100%{opacity:.40;transform:scale(.992)}
+  50%{opacity:1;transform:scale(1.016)}
 }
 @-webkit-keyframes m7VideoFrameGlow{
-  0%,100%{opacity:.40;box-shadow:0 0 5px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 24%,transparent)}
-  50%{opacity:1;box-shadow:0 0 20px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 72%,transparent),0 0 30px color-mix(in srgb,var(--m7-video-frame-secondary,#f2d18d) 38%,transparent)}
+  0%,100%{opacity:.40;-webkit-transform:scale(.992)}
+  50%{opacity:1;-webkit-transform:scale(1.016)}
 }
 @keyframes m7VideoFrameShimmer{
-  0%,100%{opacity:.40;filter:brightness(.96)}
-  34%{opacity:1;filter:brightness(1.48)}
-  68%{opacity:.58;filter:brightness(1.10)}
+  0%,100%{opacity:.42;transform:translateX(-.6%) scale(.998)}
+  34%{opacity:1;transform:translateX(.35%) scale(1.01)}
+  68%{opacity:.60;transform:translateX(.7%) scale(1.002)}
 }
 @-webkit-keyframes m7VideoFrameShimmer{
-  0%,100%{opacity:.40;-webkit-filter:brightness(.96)}
-  34%{opacity:1;-webkit-filter:brightness(1.48)}
-  68%{opacity:.58;-webkit-filter:brightness(1.10)}
+  0%,100%{opacity:.42;-webkit-transform:translateX(-.6%) scale(.998)}
+  34%{opacity:1;-webkit-transform:translateX(.35%) scale(1.01)}
+  68%{opacity:.60;-webkit-transform:translateX(.7%) scale(1.002)}
 }
 @keyframes m7VideoFrameBreathe{
-  0%,100%{opacity:.50;box-shadow:0 0 7px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 25%,transparent)}
-  50%{opacity:.96;box-shadow:0 0 15px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 58%,transparent)}
+  0%,100%{opacity:.50;transform:scale(.992)}
+  50%{opacity:.96;transform:scale(1.014)}
 }
 @-webkit-keyframes m7VideoFrameBreathe{
-  0%,100%{opacity:.50;box-shadow:0 0 7px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 25%,transparent)}
-  50%{opacity:.96;box-shadow:0 0 15px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 58%,transparent)}
+  0%,100%{opacity:.50;-webkit-transform:scale(.992)}
+  50%{opacity:.96;-webkit-transform:scale(1.014)}
 }
 @keyframes m7VideoFrameFlicker{
-  0%,18%,22%,25%,53%,57%,100%{opacity:.90;filter:brightness(1.12)}
-  20%,24%,55%{opacity:.34;filter:brightness(.78)}
+  0%,18%,22%,25%,53%,57%,100%{opacity:.90}
+  20%,24%,55%{opacity:.34}
 }
 @-webkit-keyframes m7VideoFrameFlicker{
-  0%,18%,22%,25%,53%,57%,100%{opacity:.90;-webkit-filter:brightness(1.12)}
-  20%,24%,55%{opacity:.34;-webkit-filter:brightness(.78)}
+  0%,18%,22%,25%,53%,57%,100%{opacity:.90}
+  20%,24%,55%{opacity:.34}
 }
 
 /* Animation aura for every photo frame style, without moving the image itself. */
@@ -1376,7 +1378,7 @@ body{
   border-radius:inherit;
   opacity:0;
   box-shadow:0 0 0 transparent;
-  will-change:opacity,filter,box-shadow;
+  will-change:opacity,transform;
 }
 
 /* Same fix for Current premium / 2 / 3 / 4-color / soft-blend video frames. */
@@ -1405,6 +1407,7 @@ body{
 #m7-media-showcase.m7-video-frame-anim-glow .video::after{
   animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
+  box-shadow:0 0 18px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 58%,transparent);
 }
 #m7-media-showcase.m7-video-frame-anim-shimmer .video::after{
   animation:m7VideoFrameShimmer var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
@@ -1414,6 +1417,7 @@ body{
 #m7-media-showcase.m7-video-frame-anim-breathe .video::after{
   animation:m7VideoFrameBreathe var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7VideoFrameBreathe var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
+  box-shadow:0 0 14px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 46%,transparent);
 }
 #m7-media-showcase.m7-video-frame-anim-flicker .video::after{
   animation:m7VideoFrameFlicker var(--m7-video-frame-speed,3.2s) linear infinite;
@@ -1425,12 +1429,12 @@ body{
 #m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-pulse .video .m7-media-frame-layer{
   animation:m7VideoFramePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7VideoFramePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
-  will-change:filter,opacity;
+  will-change:transform,opacity;
 }
 #m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-wave .video .m7-media-frame-layer{
   animation:m7VideoFrameWave var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
   -webkit-animation:m7VideoFrameWave var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
-  will-change:filter,opacity;
+  will-change:transform,opacity;
 }
 #m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-glow .video .m7-media-frame-layer{
   animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite;
