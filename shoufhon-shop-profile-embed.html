@@ -13604,6 +13604,14 @@ html body #ma7alak-profile-shell #ma7alak-profile-banner[data-image-crop]::befor
   transform:none!important;animation:none!important;-webkit-animation:none!important;
   filter:none!important;opacity:1!important;z-index:0!important;pointer-events:none!important;
 }
+/* A manual color fills the whole banner without an image-only fade/shade. */
+html body #ma7alak-profile-shell #ma7alak-profile-banner[data-solid-banner]{
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+html body #ma7alak-profile-shell #ma7alak-profile-banner[data-solid-banner]::before,
+html body #ma7alak-profile-shell #ma7alak-profile-banner[data-solid-banner]::after{
+  content:none!important;display:none!important;
+}
 html body #ma7alak-profile-shell #ma7alak-story-preview{position:relative!important;overflow:hidden!important}
 html body #ma7alak-profile-shell #ma7alak-story-preview img{
   position:absolute!important;inset:auto!important;
@@ -13634,9 +13642,15 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
       const raw=String(o.profile_banner_image_url||"").trim();
       const url=/^https?:\/\//i.test(raw)?raw.replace(/\\/g,"%5C").replace(/"/g,"%22").replace(/[\r\n]/g,""):"";
       shell.style.setProperty("--m7-banner-crop-image",url?'url("'+url+'")':"none");
-      const enabled=o.profile_banner_enabled!==false&&String(o.profile_banner_enabled||"").toLowerCase()!=="false";
+      const rawColor=String(o.profile_banner_color||"").trim();
+      const color=/^#[0-9a-f]{6}$/i.test(rawColor)?rawColor:"#171217";
+      const enabled=o.profile_banner_enabled===undefined?Boolean(url||/^#[0-9a-f]{6}$/i.test(rawColor)):o.profile_banner_enabled!==false&&String(o.profile_banner_enabled).toLowerCase()!=="false";
       const styleName=String(o.profile_banner_style||"rounded-fade").toLowerCase();
-      banner.classList.toggle("visible",Boolean(url)&&enabled);
+      // Image removal changes the surface, not the banner's height or logo overlap.
+      banner.classList.toggle("visible",enabled);
+      shell.classList.toggle("m7-profile-has-banner",enabled);
+      banner.toggleAttribute("data-solid-banner",!url);
+      banner.style.setProperty("background-color",color,"important");
       banner.classList.toggle("m7-banner-straight",styleName==="straight");
       banner.classList.toggle("m7-banner-rounded",styleName==="rounded");
       banner.classList.toggle("m7-banner-wave",styleName==="wave");
@@ -13647,7 +13661,7 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
         banner.style.setProperty("background-image","none","important");
       }else{
         banner.removeAttribute("data-image-crop");
-        banner.style.removeProperty("background-image");
+        banner.style.setProperty("background-image","none","important");
       }
     }
   }
@@ -13669,3 +13683,4 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
   schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
 })();
 </script>
+
