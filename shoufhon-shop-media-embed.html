@@ -2409,6 +2409,16 @@ body{
 #m7-media-showcase.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo::after{background:transparent;}
 #m7-media-showcase.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video::after{background:transparent;}
 
+/* Animated rings need a neutral backing. Painting the identical selected
+   gradient underneath the masked ring cancels opacity/flicker completely:
+   fading the top colour only reveals the same colour below. Keep the saved
+   gradient on the animated ring; static/None and stacked frames keep theirs.
+   This changes only the existing border paint, never the media or geometry. */
+#m7-media-showcase:is(.m7-frame-anim-pulse,.m7-frame-anim-wave,.m7-frame-anim-glow,.m7-frame-anim-shimmer,.m7-frame-anim-breathe,.m7-frame-anim-flicker,.m7-frame-anim-double-pulse,.m7-frame-anim-aurora-flow,.m7-frame-anim-comet-sweep,.m7-frame-anim-sparkle,.m7-frame-anim-color-drift,.m7-frame-anim-soft-blink):not(.m7-gallery-frame-layers):not(.m7-gallery-frame-none) :is(.m7-media-card,.m7-media-hero-card).photo,
+#m7-media-showcase:is(.m7-video-frame-anim-pulse,.m7-video-frame-anim-wave,.m7-video-frame-anim-glow,.m7-video-frame-anim-shimmer,.m7-video-frame-anim-breathe,.m7-video-frame-anim-flicker,.m7-video-frame-anim-double-pulse,.m7-video-frame-anim-aurora-flow,.m7-video-frame-anim-comet-sweep,.m7-video-frame-anim-sparkle,.m7-video-frame-anim-color-drift,.m7-video-frame-anim-soft-blink):not(.m7-video-frame-layers):not(.m7-video-frame-none) :is(.m7-media-card,.m7-media-hero-card).video{
+  background:#070607;
+}
+
 /* =========================================================
    STATIC / REDUCED MOTION
 ========================================================= */
