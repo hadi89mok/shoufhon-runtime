@@ -15046,4 +15046,12 @@ html body #m7-media-showcase[data-shop-slug="hiba-shop"] .m7-media-hero-card{
 
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-online-status.js"></script>
 
+<!-- Device inspection is opt-in; normal shop visits do not load this module. -->
+<script>
+if(new URLSearchParams(location.search).get("media-debug")==="1"){
+  const diagnostics=document.createElement("script");
+  diagnostics.src="__SHOUFHON_EMBED_BASE__shoufhon-media-debug.js";
+  document.head.appendChild(diagnostics);
+}
+</script>
 
