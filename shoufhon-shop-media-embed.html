@@ -3152,6 +3152,17 @@ body{
     height:min(72%,calc(var(--m7-vv-height,100%) - 8px),630px)
   }
 }
+/* Offscreen media cards keep their DOM/image visible but stop decorative motion. */
+#m7-media-showcase .m7-media-motion-sleep,
+#m7-media-showcase .m7-media-motion-sleep *,
+#m7-media-showcase .m7-media-motion-sleep::before,
+#m7-media-showcase .m7-media-motion-sleep::after,
+#m7-media-showcase .m7-media-motion-sleep *::before,
+#m7-media-showcase .m7-media-motion-sleep *::after{
+  animation-play-state:paused!important;
+  -webkit-animation-play-state:paused!important;
+  will-change:auto!important;
+}
 </style>
 
 <script src="__SHOUFHON_EMBED_BASE__shoufhon-circle-design.js"></script>
@@ -3612,6 +3623,9 @@ body{
     true;
 
   let previewObserver =
+    null;
+
+  let cardMotionObserver =
     null;
 
   const visiblePreviewVideos =
@@ -7453,6 +7467,7 @@ body{
   function renderVisibleMedia(){
 
     disconnectPreviewObserver();
+    disconnectCardMotionObserver();
 
 
     if(
@@ -7668,6 +7683,7 @@ body{
     updateDots();
 
     startPreviewObserver();
+    startCardMotionObserver();
 
     applyTypography();
 
@@ -8099,6 +8115,74 @@ body{
     });
     drainPreviewPrimeQueue();
   }
+
+  function disconnectCardMotionObserver(){
+
+    if(cardMotionObserver){
+      try{cardMotionObserver.disconnect()}catch(_){}
+      cardMotionObserver=null;
+    }
+
+    root
+      .querySelectorAll(".m7-media-motion-sleep")
+      .forEach(function(card){
+        card.classList.remove("m7-media-motion-sleep");
+      });
+
+  }
+
+
+  function startCardMotionObserver(){
+
+    disconnectCardMotionObserver();
+
+    const cards =
+      Array.from(
+        root.querySelectorAll(
+          ".m7-media-hero-card,.m7-media-card"
+        )
+      );
+
+    if(!cards.length || !("IntersectionObserver" in window)){
+      return;
+    }
+
+    const viewportHeight =
+      window.innerHeight ||
+      document.documentElement.clientHeight ||
+      0;
+
+    cards.forEach(function(card){
+      try{
+        const rect=card.getBoundingClientRect();
+        const near=rect.bottom>=-260 && rect.top<=viewportHeight+260;
+        card.classList.toggle("m7-media-motion-sleep",!near);
+      }catch(_){}
+    });
+
+    cardMotionObserver =
+      new IntersectionObserver(
+        function(entries){
+          entries.forEach(function(entry){
+            entry.target.classList.toggle(
+              "m7-media-motion-sleep",
+              !entry.isIntersecting
+            );
+          });
+        },
+        {
+          root:null,
+          rootMargin:"260px 0px",
+          threshold:0
+        }
+      );
+
+    cards.forEach(function(card){
+      try{cardMotionObserver.observe(card)}catch(_){}
+    });
+
+  }
+
 
   function disconnectPreviewObserver(){
 
