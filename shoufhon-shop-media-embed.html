@@ -990,42 +990,42 @@ body{
   display:none;
 }
 
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-1-on .photo .m7-media-frame-layer[data-frame-layer="1"],
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-2-on .photo .m7-media-frame-layer[data-frame-layer="2"],
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-3-on .photo .m7-media-frame-layer[data-frame-layer="3"],
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-4-on .photo .m7-media-frame-layer[data-frame-layer="4"]{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-1-on :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="1"],
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-2-on :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="2"],
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-3-on :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="3"],
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-layer-4-on :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="4"]{
   display:block;
 }
 
-#m7-media-showcase.m7-gallery-frame-layers .photo .m7-media-frame-layer[data-frame-layer="1"]{
+#m7-media-showcase.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="1"]{
   inset:var(--m7-frame-1-inset,-2px);
   border:var(--m7-frame-1-width,2px) solid var(--m7-frame-1-color,#e2a6b8);
   border-radius:var(--m7-frame-1-radius,20px);
   animation-delay:0s;
 }
-#m7-media-showcase.m7-gallery-frame-layers .photo .m7-media-frame-layer[data-frame-layer="2"]{
+#m7-media-showcase.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="2"]{
   inset:var(--m7-frame-2-inset,-5px);
   border:var(--m7-frame-2-width,2px) solid var(--m7-frame-2-color,#f2d18d);
   border-radius:var(--m7-frame-2-radius,23px);
   animation-delay:.16s;
 }
-#m7-media-showcase.m7-gallery-frame-layers .photo .m7-media-frame-layer[data-frame-layer="3"]{
+#m7-media-showcase.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="3"]{
   inset:var(--m7-frame-3-inset,-8px);
   border:var(--m7-frame-3-width,2px) solid var(--m7-frame-3-color,#c88f45);
   border-radius:var(--m7-frame-3-radius,26px);
   animation-delay:.32s;
 }
-#m7-media-showcase.m7-gallery-frame-layers .photo .m7-media-frame-layer[data-frame-layer="4"]{
+#m7-media-showcase.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="4"]{
   inset:var(--m7-frame-4-inset,-11px);
   border:var(--m7-frame-4-width,2px) solid var(--m7-frame-4-color,#e7aa5b);
   border-radius:var(--m7-frame-4-radius,29px);
   animation-delay:.48s;
 }
 
-#m7-media-showcase.m7-frame-gradient-1 .photo .m7-media-frame-layer[data-frame-layer="1"],
-#m7-media-showcase.m7-frame-gradient-2 .photo .m7-media-frame-layer[data-frame-layer="2"],
-#m7-media-showcase.m7-frame-gradient-3 .photo .m7-media-frame-layer[data-frame-layer="3"],
-#m7-media-showcase.m7-frame-gradient-4 .photo .m7-media-frame-layer[data-frame-layer="4"]{
+#m7-media-showcase.m7-frame-gradient-1 :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="1"],
+#m7-media-showcase.m7-frame-gradient-2 :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="2"],
+#m7-media-showcase.m7-frame-gradient-3 :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="3"],
+#m7-media-showcase.m7-frame-gradient-4 :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer[data-frame-layer="4"]{
   border:0;
   padding:var(--m7-frame-gradient-width,2px);
   background:var(--m7-frame-gradient,linear-gradient(315deg,#e2a6b8,#f2d18d));
@@ -1102,7 +1102,7 @@ body{
 /* Non-layer frames need a real visible ring to animate. Previously pulse/wave/
    shimmer mostly animated a transparent pseudo-element, so only Stacked color
    layers visibly moved. This masked ring mirrors the selected actual frame. */
-#m7-media-showcase:not(.m7-gallery-frame-layers):not(.m7-gallery-frame-none) .photo::after{
+#m7-media-showcase:not(.m7-gallery-frame-layers):not(.m7-gallery-frame-none) :is(.m7-media-card,.m7-media-hero-card).photo::after{
   padding:var(--m7-gallery-frame-width,3px);
   background:var(--m7-gallery-frame-bg,var(--m7-gallery-frame-primary,#d9a441));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
@@ -1110,65 +1110,65 @@ body{
   mask-composite:exclude;
 }
 
-#m7-media-showcase.m7-gallery-frame-none .photo::after{
+#m7-media-showcase.m7-gallery-frame-none :is(.m7-media-card,.m7-media-hero-card).photo::after{
   display:none;
 }
 
-#m7-media-showcase.m7-frame-anim-pulse .photo::after{
+#m7-media-showcase.m7-frame-anim-pulse :is(.m7-media-card,.m7-media-hero-card).photo::after{
   animation:m7GalleryFramePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFramePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 14px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 48%,transparent);
 }
-#m7-media-showcase.m7-frame-anim-wave .photo::after{
+#m7-media-showcase.m7-frame-anim-wave :is(.m7-media-card,.m7-media-hero-card).photo::after{
   animation:m7GalleryFrameWave var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameWave var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 13px color-mix(in srgb,var(--m7-gallery-frame-secondary,#f2d18d) 44%,transparent);
 }
-#m7-media-showcase.m7-frame-anim-glow .photo::after{
+#m7-media-showcase.m7-frame-anim-glow :is(.m7-media-card,.m7-media-hero-card).photo::after{
   animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 18px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 58%,transparent);
 }
-#m7-media-showcase.m7-frame-anim-shimmer .photo::after{
+#m7-media-showcase.m7-frame-anim-shimmer :is(.m7-media-card,.m7-media-hero-card).photo::after{
   animation:m7GalleryFrameShimmer var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameShimmer var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 16px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 52%,transparent);
 }
-#m7-media-showcase.m7-frame-anim-breathe .photo::after{
+#m7-media-showcase.m7-frame-anim-breathe :is(.m7-media-card,.m7-media-hero-card).photo::after{
   animation:m7GalleryFrameBreathe var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameBreathe var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 14px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 46%,transparent);
 }
-#m7-media-showcase.m7-frame-anim-flicker .photo::after{
+#m7-media-showcase.m7-frame-anim-flicker :is(.m7-media-card,.m7-media-hero-card).photo::after{
   animation:m7GalleryFrameFlicker var(--m7-gallery-frame-speed,3.2s) linear infinite!important;
   -webkit-animation:m7GalleryFrameFlicker var(--m7-gallery-frame-speed,3.2s) linear infinite!important;
   box-shadow:0 0 16px color-mix(in srgb,var(--m7-gallery-frame-primary,#d9a441) 48%,transparent);
 }
 
 /* Layer mode animates the actual color layers too. */
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-pulse .photo .m7-media-frame-layer{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-pulse :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{
   animation:m7GalleryFramePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFramePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   will-change:transform,opacity;
 }
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-wave .photo .m7-media-frame-layer{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-wave :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{
   animation:m7GalleryFrameWave var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameWave var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   will-change:transform,opacity;
 }
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-glow .photo .m7-media-frame-layer{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-glow :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{
   animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameGlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
 }
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-shimmer .photo .m7-media-frame-layer{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-shimmer :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{
   animation:m7GalleryFrameShimmer var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameShimmer var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
 }
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-breathe .photo .m7-media-frame-layer{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-breathe :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{
   animation:m7GalleryFrameBreathe var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7GalleryFrameBreathe var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;
 }
-#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-flicker .photo .m7-media-frame-layer{
+#m7-media-showcase.m7-gallery-frame-layers.m7-frame-anim-flicker :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{
   animation:m7GalleryFrameFlicker var(--m7-gallery-frame-speed,3.2s) linear infinite!important;
   -webkit-animation:m7GalleryFrameFlicker var(--m7-gallery-frame-speed,3.2s) linear infinite!important;
 }
@@ -1272,42 +1272,42 @@ body{
   display:none;
 }
 
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-1-on .video .m7-media-frame-layer[data-frame-layer="1"],
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-2-on .video .m7-media-frame-layer[data-frame-layer="2"],
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-3-on .video .m7-media-frame-layer[data-frame-layer="3"],
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-4-on .video .m7-media-frame-layer[data-frame-layer="4"]{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-1-on :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="1"],
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-2-on :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="2"],
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-3-on :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="3"],
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-layer-4-on :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="4"]{
   display:block;
 }
 
-#m7-media-showcase.m7-video-frame-layers .video .m7-media-frame-layer[data-frame-layer="1"]{
+#m7-media-showcase.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="1"]{
   inset:var(--m7-video-frame-1-inset,-2px);
   border:var(--m7-video-frame-1-width,2px) solid var(--m7-video-frame-1-color,#e2a6b8);
   border-radius:var(--m7-video-frame-1-radius,20px);
   animation-delay:0s;
 }
-#m7-media-showcase.m7-video-frame-layers .video .m7-media-frame-layer[data-frame-layer="2"]{
+#m7-media-showcase.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="2"]{
   inset:var(--m7-video-frame-2-inset,-5px);
   border:var(--m7-video-frame-2-width,2px) solid var(--m7-video-frame-2-color,#f2d18d);
   border-radius:var(--m7-video-frame-2-radius,23px);
   animation-delay:.16s;
 }
-#m7-media-showcase.m7-video-frame-layers .video .m7-media-frame-layer[data-frame-layer="3"]{
+#m7-media-showcase.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="3"]{
   inset:var(--m7-video-frame-3-inset,-8px);
   border:var(--m7-video-frame-3-width,2px) solid var(--m7-video-frame-3-color,#c88f45);
   border-radius:var(--m7-video-frame-3-radius,26px);
   animation-delay:.32s;
 }
-#m7-media-showcase.m7-video-frame-layers .video .m7-media-frame-layer[data-frame-layer="4"]{
+#m7-media-showcase.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="4"]{
   inset:var(--m7-video-frame-4-inset,-11px);
   border:var(--m7-video-frame-4-width,2px) solid var(--m7-video-frame-4-color,#e7aa5b);
   border-radius:var(--m7-video-frame-4-radius,29px);
   animation-delay:.48s;
 }
 
-#m7-media-showcase.m7-video-frame-gradient-1 .video .m7-media-frame-layer[data-frame-layer="1"],
-#m7-media-showcase.m7-video-frame-gradient-2 .video .m7-media-frame-layer[data-frame-layer="2"],
-#m7-media-showcase.m7-video-frame-gradient-3 .video .m7-media-frame-layer[data-frame-layer="3"],
-#m7-media-showcase.m7-video-frame-gradient-4 .video .m7-media-frame-layer[data-frame-layer="4"]{
+#m7-media-showcase.m7-video-frame-gradient-1 :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="1"],
+#m7-media-showcase.m7-video-frame-gradient-2 :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="2"],
+#m7-media-showcase.m7-video-frame-gradient-3 :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="3"],
+#m7-media-showcase.m7-video-frame-gradient-4 :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer[data-frame-layer="4"]{
   border:0;
   padding:var(--m7-video-frame-gradient-width,2px);
   background:var(--m7-video-frame-gradient,linear-gradient(315deg,#e2a6b8,#f2d18d));
@@ -1382,7 +1382,7 @@ body{
 }
 
 /* Same fix for Current premium / 2 / 3 / 4-color / soft-blend video frames. */
-#m7-media-showcase:not(.m7-video-frame-layers):not(.m7-video-frame-none) .video::after{
+#m7-media-showcase:not(.m7-video-frame-layers):not(.m7-video-frame-none) :is(.m7-media-card,.m7-media-hero-card).video::after{
   padding:var(--m7-video-frame-width,3px);
   background:var(--m7-video-frame-bg,var(--m7-video-frame-primary,#d9a441));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
@@ -1390,65 +1390,65 @@ body{
   mask-composite:exclude;
 }
 
-#m7-media-showcase.m7-video-frame-none .video::after{
+#m7-media-showcase.m7-video-frame-none :is(.m7-media-card,.m7-media-hero-card).video::after{
   display:none;
 }
 
-#m7-media-showcase.m7-video-frame-anim-pulse .video::after{
+#m7-media-showcase.m7-video-frame-anim-pulse :is(.m7-media-card,.m7-media-hero-card).video::after{
   animation:m7VideoFramePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFramePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 14px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 48%,transparent);
 }
-#m7-media-showcase.m7-video-frame-anim-wave .video::after{
+#m7-media-showcase.m7-video-frame-anim-wave :is(.m7-media-card,.m7-media-hero-card).video::after{
   animation:m7VideoFrameWave var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameWave var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 13px color-mix(in srgb,var(--m7-video-frame-secondary,#f2d18d) 44%,transparent);
 }
-#m7-media-showcase.m7-video-frame-anim-glow .video::after{
+#m7-media-showcase.m7-video-frame-anim-glow :is(.m7-media-card,.m7-media-hero-card).video::after{
   animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 18px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 58%,transparent);
 }
-#m7-media-showcase.m7-video-frame-anim-shimmer .video::after{
+#m7-media-showcase.m7-video-frame-anim-shimmer :is(.m7-media-card,.m7-media-hero-card).video::after{
   animation:m7VideoFrameShimmer var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameShimmer var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 16px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 52%,transparent);
 }
-#m7-media-showcase.m7-video-frame-anim-breathe .video::after{
+#m7-media-showcase.m7-video-frame-anim-breathe :is(.m7-media-card,.m7-media-hero-card).video::after{
   animation:m7VideoFrameBreathe var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameBreathe var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   box-shadow:0 0 14px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 46%,transparent);
 }
-#m7-media-showcase.m7-video-frame-anim-flicker .video::after{
+#m7-media-showcase.m7-video-frame-anim-flicker :is(.m7-media-card,.m7-media-hero-card).video::after{
   animation:m7VideoFrameFlicker var(--m7-video-frame-speed,3.2s) linear infinite!important;
   -webkit-animation:m7VideoFrameFlicker var(--m7-video-frame-speed,3.2s) linear infinite!important;
   box-shadow:0 0 16px color-mix(in srgb,var(--m7-video-frame-primary,#d9a441) 48%,transparent);
 }
 
 /* Layer mode animates the actual color layers too. */
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-pulse .video .m7-media-frame-layer{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-pulse :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{
   animation:m7VideoFramePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFramePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   will-change:transform,opacity;
 }
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-wave .video .m7-media-frame-layer{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-wave :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{
   animation:m7VideoFrameWave var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameWave var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   will-change:transform,opacity;
 }
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-glow .video .m7-media-frame-layer{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-glow :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{
   animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameGlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
 }
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-shimmer .video .m7-media-frame-layer{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-shimmer :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{
   animation:m7VideoFrameShimmer var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameShimmer var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
 }
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-breathe .video .m7-media-frame-layer{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-breathe :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{
   animation:m7VideoFrameBreathe var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
   -webkit-animation:m7VideoFrameBreathe var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;
 }
-#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-flicker .video .m7-media-frame-layer{
+#m7-media-showcase.m7-video-frame-layers.m7-video-frame-anim-flicker :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{
   animation:m7VideoFrameFlicker var(--m7-video-frame-speed,3.2s) linear infinite!important;
   -webkit-animation:m7VideoFrameFlicker var(--m7-video-frame-speed,3.2s) linear infinite!important;
 }
@@ -2384,30 +2384,30 @@ body{
 /* Shared gallery motions animate only the decorative border, never the media. */
 @keyframes m7MediaDoublePulse{0%,45%,100%{opacity:.35}12%,30%{opacity:1}22%{opacity:.55}}
 @-webkit-keyframes m7MediaDoublePulse{0%,45%,100%{opacity:.35}12%,30%{opacity:1}22%{opacity:.55}}
-#m7-media-showcase.m7-frame-anim-double-pulse .photo::after,#m7-media-showcase.m7-frame-anim-double-pulse.m7-gallery-frame-layers .photo .m7-media-frame-layer{animation:m7MediaDoublePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaDoublePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
-#m7-media-showcase.m7-video-frame-anim-double-pulse .video::after,#m7-media-showcase.m7-video-frame-anim-double-pulse.m7-video-frame-layers .video .m7-media-frame-layer{animation:m7MediaDoublePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaDoublePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
+#m7-media-showcase.m7-frame-anim-double-pulse :is(.m7-media-card,.m7-media-hero-card).photo::after,#m7-media-showcase.m7-frame-anim-double-pulse.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{animation:m7MediaDoublePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaDoublePulse var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
+#m7-media-showcase.m7-video-frame-anim-double-pulse :is(.m7-media-card,.m7-media-hero-card).video::after,#m7-media-showcase.m7-video-frame-anim-double-pulse.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{animation:m7MediaDoublePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaDoublePulse var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
 @keyframes m7MediaAuroraFlow{0%,100%{background-position:0% 50%;opacity:.65}50%{background-position:100% 50%;opacity:1}}
 @-webkit-keyframes m7MediaAuroraFlow{0%,100%{background-position:0% 50%;opacity:.65}50%{background-position:100% 50%;opacity:1}}
-#m7-media-showcase.m7-frame-anim-aurora-flow .photo::after,#m7-media-showcase.m7-frame-anim-aurora-flow.m7-gallery-frame-layers .photo .m7-media-frame-layer{animation:m7MediaAuroraFlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaAuroraFlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-gallery-frame-primary,#d9a441),var(--m7-gallery-frame-secondary,#f2d18d),var(--m7-gallery-frame-primary,#d9a441));background-size:300% 100%;}
-#m7-media-showcase.m7-video-frame-anim-aurora-flow .video::after,#m7-media-showcase.m7-video-frame-anim-aurora-flow.m7-video-frame-layers .video .m7-media-frame-layer{animation:m7MediaAuroraFlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaAuroraFlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-video-frame-primary,#d9a441),var(--m7-video-frame-secondary,#f2d18d),var(--m7-video-frame-primary,#d9a441));background-size:300% 100%;}
+#m7-media-showcase.m7-frame-anim-aurora-flow :is(.m7-media-card,.m7-media-hero-card).photo::after,#m7-media-showcase.m7-frame-anim-aurora-flow.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{animation:m7MediaAuroraFlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaAuroraFlow var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-gallery-frame-primary,#d9a441),var(--m7-gallery-frame-secondary,#f2d18d),var(--m7-gallery-frame-primary,#d9a441));background-size:300% 100%;}
+#m7-media-showcase.m7-video-frame-anim-aurora-flow :is(.m7-media-card,.m7-media-hero-card).video::after,#m7-media-showcase.m7-video-frame-anim-aurora-flow.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{animation:m7MediaAuroraFlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaAuroraFlow var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-video-frame-primary,#d9a441),var(--m7-video-frame-secondary,#f2d18d),var(--m7-video-frame-primary,#d9a441));background-size:300% 100%;}
 @keyframes m7MediaCometSweep{0%{background-position:200% 50%;opacity:.8}100%{background-position:-100% 50%;opacity:.8}}
 @-webkit-keyframes m7MediaCometSweep{0%{background-position:200% 50%;opacity:.8}100%{background-position:-100% 50%;opacity:.8}}
-#m7-media-showcase.m7-frame-anim-comet-sweep .photo::after,#m7-media-showcase.m7-frame-anim-comet-sweep.m7-gallery-frame-layers .photo .m7-media-frame-layer{animation:m7MediaCometSweep var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaCometSweep var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,transparent 30%,var(--m7-gallery-frame-primary,#d9a441) 44%,#fff 50%,var(--m7-gallery-frame-secondary,#f2d18d) 56%,transparent 70%);background-size:300% 100%;}
-#m7-media-showcase.m7-video-frame-anim-comet-sweep .video::after,#m7-media-showcase.m7-video-frame-anim-comet-sweep.m7-video-frame-layers .video .m7-media-frame-layer{animation:m7MediaCometSweep var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaCometSweep var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,transparent 30%,var(--m7-video-frame-primary,#d9a441) 44%,#fff 50%,var(--m7-video-frame-secondary,#f2d18d) 56%,transparent 70%);background-size:300% 100%;}
+#m7-media-showcase.m7-frame-anim-comet-sweep :is(.m7-media-card,.m7-media-hero-card).photo::after,#m7-media-showcase.m7-frame-anim-comet-sweep.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{animation:m7MediaCometSweep var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaCometSweep var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,transparent 30%,var(--m7-gallery-frame-primary,#d9a441) 44%,#fff 50%,var(--m7-gallery-frame-secondary,#f2d18d) 56%,transparent 70%);background-size:300% 100%;}
+#m7-media-showcase.m7-video-frame-anim-comet-sweep :is(.m7-media-card,.m7-media-hero-card).video::after,#m7-media-showcase.m7-video-frame-anim-comet-sweep.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{animation:m7MediaCometSweep var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaCometSweep var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,transparent 30%,var(--m7-video-frame-primary,#d9a441) 44%,#fff 50%,var(--m7-video-frame-secondary,#f2d18d) 56%,transparent 70%);background-size:300% 100%;}
 @keyframes m7MediaSparkle{0%,100%{opacity:.45}20%,60%{opacity:.9}35%,75%{opacity:.65}}
 @-webkit-keyframes m7MediaSparkle{0%,100%{opacity:.45}20%,60%{opacity:.9}35%,75%{opacity:.65}}
-#m7-media-showcase.m7-frame-anim-sparkle .photo::after,#m7-media-showcase.m7-frame-anim-sparkle.m7-gallery-frame-layers .photo .m7-media-frame-layer{animation:m7MediaSparkle var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSparkle var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
-#m7-media-showcase.m7-video-frame-anim-sparkle .video::after,#m7-media-showcase.m7-video-frame-anim-sparkle.m7-video-frame-layers .video .m7-media-frame-layer{animation:m7MediaSparkle var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSparkle var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
+#m7-media-showcase.m7-frame-anim-sparkle :is(.m7-media-card,.m7-media-hero-card).photo::after,#m7-media-showcase.m7-frame-anim-sparkle.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{animation:m7MediaSparkle var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSparkle var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
+#m7-media-showcase.m7-video-frame-anim-sparkle :is(.m7-media-card,.m7-media-hero-card).video::after,#m7-media-showcase.m7-video-frame-anim-sparkle.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{animation:m7MediaSparkle var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSparkle var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
 @keyframes m7MediaColorDrift{0%,100%{background-position:0% 50%;opacity:.9}50%{background-position:100% 50%;opacity:.9}}
 @-webkit-keyframes m7MediaColorDrift{0%,100%{background-position:0% 50%;opacity:.9}50%{background-position:100% 50%;opacity:.9}}
-#m7-media-showcase.m7-frame-anim-color-drift .photo::after,#m7-media-showcase.m7-frame-anim-color-drift.m7-gallery-frame-layers .photo .m7-media-frame-layer{animation:m7MediaColorDrift var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaColorDrift var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-gallery-frame-primary,#d9a441),var(--m7-gallery-frame-secondary,#f2d18d),var(--m7-gallery-frame-primary,#d9a441));background-size:300% 100%;}
-#m7-media-showcase.m7-video-frame-anim-color-drift .video::after,#m7-media-showcase.m7-video-frame-anim-color-drift.m7-video-frame-layers .video .m7-media-frame-layer{animation:m7MediaColorDrift var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaColorDrift var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-video-frame-primary,#d9a441),var(--m7-video-frame-secondary,#f2d18d),var(--m7-video-frame-primary,#d9a441));background-size:300% 100%;}
+#m7-media-showcase.m7-frame-anim-color-drift :is(.m7-media-card,.m7-media-hero-card).photo::after,#m7-media-showcase.m7-frame-anim-color-drift.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{animation:m7MediaColorDrift var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaColorDrift var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-gallery-frame-primary,#d9a441),var(--m7-gallery-frame-secondary,#f2d18d),var(--m7-gallery-frame-primary,#d9a441));background-size:300% 100%;}
+#m7-media-showcase.m7-video-frame-anim-color-drift :is(.m7-media-card,.m7-media-hero-card).video::after,#m7-media-showcase.m7-video-frame-anim-color-drift.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{animation:m7MediaColorDrift var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaColorDrift var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;background-image:linear-gradient(110deg,var(--m7-video-frame-primary,#d9a441),var(--m7-video-frame-secondary,#f2d18d),var(--m7-video-frame-primary,#d9a441));background-size:300% 100%;}
 @keyframes m7MediaSoftBlink{0%,100%{opacity:.3}50%{opacity:1}}
 @-webkit-keyframes m7MediaSoftBlink{0%,100%{opacity:.3}50%{opacity:1}}
-#m7-media-showcase.m7-frame-anim-soft-blink .photo::after,#m7-media-showcase.m7-frame-anim-soft-blink.m7-gallery-frame-layers .photo .m7-media-frame-layer{animation:m7MediaSoftBlink var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSoftBlink var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
-#m7-media-showcase.m7-video-frame-anim-soft-blink .video::after,#m7-media-showcase.m7-video-frame-anim-soft-blink.m7-video-frame-layers .video .m7-media-frame-layer{animation:m7MediaSoftBlink var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSoftBlink var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
-#m7-media-showcase.m7-gallery-frame-layers .photo::after{background:transparent;}
-#m7-media-showcase.m7-video-frame-layers .video::after{background:transparent;}
+#m7-media-showcase.m7-frame-anim-soft-blink :is(.m7-media-card,.m7-media-hero-card).photo::after,#m7-media-showcase.m7-frame-anim-soft-blink.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo .m7-media-frame-layer{animation:m7MediaSoftBlink var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSoftBlink var(--m7-gallery-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
+#m7-media-showcase.m7-video-frame-anim-soft-blink :is(.m7-media-card,.m7-media-hero-card).video::after,#m7-media-showcase.m7-video-frame-anim-soft-blink.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video .m7-media-frame-layer{animation:m7MediaSoftBlink var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;-webkit-animation:m7MediaSoftBlink var(--m7-video-frame-speed,3.2s) ease-in-out infinite!important;will-change:auto;}
+#m7-media-showcase.m7-gallery-frame-layers :is(.m7-media-card,.m7-media-hero-card).photo::after{background:transparent;}
+#m7-media-showcase.m7-video-frame-layers :is(.m7-media-card,.m7-media-hero-card).video::after{background:transparent;}
 
 /* =========================================================
    STATIC / REDUCED MOTION
