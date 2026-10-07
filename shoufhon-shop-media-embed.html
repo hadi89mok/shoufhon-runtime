@@ -13013,6 +13013,8 @@ function whatsappNumber(raw){
       ] ||
       visibleMedia[0];
 
+    try{const tracker=window.ShoufHonJourney||window.parent?.ShoufHonJourney;tracker?.track("gallery",{shopSlug:SHOP_SLUG,contentId:String(selected?.sourceId||selected?.id||"")})}catch(_){}
+
     if(
       selected &&
       selected.kind === "album" &&
