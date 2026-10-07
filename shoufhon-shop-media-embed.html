@@ -144,6 +144,17 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
           Videos
         </button>
 
+        <button
+          type="button"
+          class="m7-media-filter"
+          data-filter="album"
+          role="tab"
+          aria-selected="false"
+          hidden
+        >
+          Albums
+        </button>
+
       </div>
 
     </header>
@@ -268,6 +279,16 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
 
   <div class="m7v-hint" id="m7v-hint">
     SWIPE
+  </div>
+
+  <div
+    class="m7v-album-meta"
+    id="m7v-album-meta"
+    aria-live="polite"
+    hidden
+  >
+    <strong id="m7v-album-title"></strong>
+    <span id="m7v-album-description"></span>
   </div>
 
   <!-- =====================================================
@@ -585,6 +606,15 @@ body{
   border-radius:0;
   background:transparent;
   box-shadow:none;
+}
+
+.m7-media-filters.has-albums{
+  grid-template-columns:
+    repeat(4,1fr);
+}
+
+.m7-media-filter[hidden]{
+  display:none!important;
 }
 
 .m7-media-filter{
@@ -2201,6 +2231,60 @@ body{
   pointer-events:none;
 }
 
+#m7-media-viewer .m7v-album-meta{
+  position:absolute;
+  left:max(14px,env(safe-area-inset-left));
+  right:max(82px,calc(env(safe-area-inset-right) + 70px));
+  bottom:max(68px,calc(env(safe-area-inset-bottom) + 54px));
+  z-index:43;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+  padding:10px 12px;
+  border:1px solid rgba(var(--m7-view-rgb,217,164,65),.20);
+  border-radius:14px;
+  background:rgba(8,8,9,.54);
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  pointer-events:none;
+  max-width:min(72vw,420px);
+}
+#m7-media-viewer .m7v-album-meta[hidden]{
+  display:none!important;
+}
+#m7-media-viewer .m7v-album-meta strong{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#fff;
+  font:900 14px/1.15 Arial,"Segoe UI",sans-serif;
+  text-shadow:0 2px 8px rgba(0,0,0,.78);
+}
+#m7-media-viewer .m7v-album-meta span{
+  display:block;
+  max-width:100%;
+  color:rgba(255,255,255,.78);
+  font:650 11px/1.35 Arial,"Segoe UI",sans-serif;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  text-shadow:0 1px 5px rgba(0,0,0,.78);
+}
+@media(max-width:520px){
+  #m7-media-viewer .m7v-album-meta{
+    left:max(12px,env(safe-area-inset-left));
+    right:max(76px,calc(env(safe-area-inset-right) + 64px));
+    bottom:max(58px,calc(env(safe-area-inset-bottom) + 46px));
+    padding:9px 10px;
+    border-radius:12px;
+  }
+  #m7-media-viewer .m7v-album-meta strong{font-size:13px}
+  #m7-media-viewer .m7v-album-meta span{font-size:10.5px}
+}
+
 
 /* =========================================================
    MOBILE
@@ -3424,6 +3508,21 @@ body{
   const viewerHint =
     document.getElementById(
       "m7v-hint"
+    );
+
+  const viewerAlbumMeta =
+    document.getElementById(
+      "m7v-album-meta"
+    );
+
+  const viewerAlbumTitle =
+    document.getElementById(
+      "m7v-album-title"
+    );
+
+  const viewerAlbumDescription =
+    document.getElementById(
+      "m7v-album-description"
     );
 
   const closeButton =
@@ -7185,6 +7284,36 @@ body{
         videoCount === 0
       );
 
+    const albumButton =
+      filters
+        ?.querySelector(
+          '[data-filter="album"]'
+        );
+
+    if(albumButton){
+      albumButton.hidden =
+        albumCount === 0;
+
+      albumButton.toggleAttribute(
+        "disabled",
+        albumCount === 0
+      );
+    }
+
+    filters
+      ?.classList
+      .toggle(
+        "has-albums",
+        albumCount > 0
+      );
+
+    if(
+      albumCount === 0 &&
+      activeFilter === "album"
+    ){
+      activeFilter = "all";
+    }
+
   }
 
 
@@ -7197,7 +7326,8 @@ body{
       [
         "all",
         "photo",
-        "video"
+        "video",
+        "album"
       ].includes(filter)
         ? filter
         : "all";
@@ -7221,6 +7351,20 @@ body{
 
       visibleMedia =
         allMedia.slice();
+
+    }
+    else if(
+      next === "album"
+    ){
+
+      visibleMedia =
+        sortMediaList(
+          allMedia.filter(
+            function(item){
+              return item.kind === "album";
+            }
+          )
+        );
 
     }
     else{
@@ -7511,7 +7655,12 @@ body{
               activeFilter ===
                 "video"
                 ? "No videos yet."
-                : "No media yet."
+                : (
+                    activeFilter ===
+                      "album"
+                      ? "No albums yet."
+                      : "No media yet."
+                  )
             );
 
       hero.innerHTML =
@@ -12425,9 +12574,37 @@ function whatsappNumber(raw){
 
 
     viewerHint.textContent =
-      viewerAlbum
-        ? viewerAlbum.title + " · SWIPE"
-        : "SWIPE";
+      "SWIPE";
+
+    if(viewerAlbumMeta){
+      const albumTitle =
+        String(
+          viewerAlbum?.title ||
+          ""
+        ).trim();
+
+      const albumDescription =
+        String(
+          viewerAlbum?.description ||
+          ""
+        ).trim();
+
+      viewerAlbumMeta.hidden =
+        !viewerAlbum;
+
+      if(viewerAlbumTitle){
+        viewerAlbumTitle.textContent =
+          albumTitle || "Album";
+      }
+
+      if(viewerAlbumDescription){
+        viewerAlbumDescription.textContent =
+          albumDescription;
+
+        viewerAlbumDescription.hidden =
+          !albumDescription;
+      }
+    }
 
 
     setViewerLoading(
