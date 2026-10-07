@@ -3684,6 +3684,19 @@ body{
   let viewerMediaLoadToken =
     0;
 
+  const viewerPreview=document.createElement("img");
+  viewerPreview.id="m7v-preview";viewerPreview.style.cssText="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:2;pointer-events:none";viewerPreview.className="m7v-image";viewerPreview.alt="";viewerPreview.setAttribute("aria-hidden","true");viewerPreview.decoding="async";viewerPreview.draggable=false;
+  viewerImage.before(viewerPreview);
+  function clearPhotoPreview(){viewerPreview.onload=null;viewerPreview.onerror=null;viewerPreview.classList.remove("active");viewerPreview.removeAttribute("src")}
+  function showPhotoPreview(item,token){
+    const card=Array.from(root.querySelectorAll("img")).find(img=>img.dataset.shoufhonOriginal===item.url||img.getAttribute("src")===item.url);
+    const src=card?.currentSrc||card?.src||window.ShoufHonMediaOptimizer?.thumbnail(item.url,Math.min(760,window.innerWidth||760))||item.url;
+    if(src===item.url)return;
+    const reveal=()=>{if(token!==viewerMediaLoadToken)return;viewerPreview.classList.add("active");viewerPreview.style.opacity="1";setViewerLoading(false)};
+    viewerPreview.onload=reveal;viewerPreview.onerror=()=>{};viewerPreview.src=src;
+    if(viewerPreview.complete&&viewerPreview.naturalWidth>0)reveal();
+  }
+
   const warmedImages =
     new Map();
 
@@ -5699,6 +5712,7 @@ body{
 
           return {
             type:"video",
+            poster:String(item.poster_url||"").trim(),
             id:
               "video-" +
               String(item.id),
@@ -7459,6 +7473,10 @@ body{
     item,
     className
   ){
+    if(validUrl(item.poster)){
+      const cover=window.ShoufHonMediaOptimizer?.thumbnail(item.poster,Math.min(380,(window.innerWidth||760)/2))||item.poster;
+      return '<img class="'+esc(className)+' m7-preview-cover" src="'+esc(cover)+'" alt="" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover"'+(cover!==item.poster?' data-shoufhon-original="'+esc(item.poster)+'"':'')+'>';
+    }
 
     return (
       '<video ' +
@@ -7485,7 +7503,7 @@ body{
     eager
   ){
 
-    const displayWidth=eager?Math.min(760,window.innerWidth||760):380;
+    const displayWidth=eager?Math.min(760,window.innerWidth||760):Math.min(380,(window.innerWidth||760)/2);
     const thumbnail=window.ShoufHonMediaOptimizer?.thumbnail(item.url,displayWidth)||item.url;
     const fallback=thumbnail!==item.url?'data-shoufhon-original="'+esc(item.url)+'" ':'';
 
@@ -12403,6 +12421,7 @@ body{
 
 
   function clearViewerMedia(){
+    clearPhotoPreview();
 
     viewerMediaLoadToken +=
       1;
@@ -12620,6 +12639,7 @@ function whatsappNumber(raw){
       "video"
     ){
 
+      viewerVideo.poster=validUrl(item.poster)?item.poster:"";
       viewerVideo.preload =
         "auto";
 
@@ -12811,6 +12831,7 @@ function whatsappNumber(raw){
 
                   viewerImage.style.opacity =
                     "1";
+                  clearPhotoPreview();
 
                   viewerImage.style.transform =
                     "translate3d(0,0,0)";
@@ -12843,12 +12864,12 @@ function whatsappNumber(raw){
             false
           );
 
-          viewerImage.style.opacity =
-            "1";
+          viewerImage.style.opacity = viewerPreview.classList.contains("active")?"0":"1";
 
         };
 
 
+      showPhotoPreview(item,loadToken);
       viewerImage.src =
         item.url;
 
@@ -14140,6 +14161,7 @@ function whatsappNumber(raw){
               return [
                 row.id,
                 row.video_url,
+                row.poster_url,
                 row.sort_order,
                 row.created_at
               ];
@@ -14231,7 +14253,7 @@ function whatsappNumber(raw){
               "shop_videos"
             )
             .select(
-              "id,video_url,sort_order,created_at"
+              "id,video_url,poster_url,sort_order,created_at"
             )
             .eq(
               "shop_slug",
@@ -15264,4 +15286,5 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 

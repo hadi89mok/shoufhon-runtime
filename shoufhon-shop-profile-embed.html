@@ -7518,8 +7518,9 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
     const image =
       document.createElement("img");
 
-    image.src =
-      imageURL;
+    const previewURL=window.ShoufHonMediaOptimizer?.thumbnail(imageURL,180)||imageURL;
+    if(previewURL!==imageURL)image.dataset.shoufhonOriginal=imageURL;
+    image.src = previewURL;
 
     image.alt =
       "Shop logo";
@@ -13705,5 +13706,6 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
   schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
 })();
 </script>
+
 
 
