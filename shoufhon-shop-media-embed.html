@@ -7341,13 +7341,18 @@ body{
     eager
   ){
 
+    const displayWidth=eager?Math.min(760,window.innerWidth||760):380;
+    const thumbnail=window.ShoufHonMediaOptimizer?.thumbnail(item.url,displayWidth)||item.url;
+    const fallback=thumbnail!==item.url?'data-shoufhon-original="'+esc(item.url)+'" ':'';
+
     return (
       '<img ' +
+        fallback +
         'class="' +
           esc(className) +
         '" ' +
         'src="' +
-          esc(item.url) +
+          esc(thumbnail) +
         '" ' +
         'alt="Shop photo" ' +
         'loading="' +
