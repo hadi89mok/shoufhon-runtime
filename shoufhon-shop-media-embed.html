@@ -7903,7 +7903,7 @@ body{
     video
   ){
 
-    if(!video){
+    if(!video || video.paused){
       return;
     }
 
@@ -8097,6 +8097,8 @@ body{
     catch(_){}
 
 
+    // Visibility updates can repeat without a playback transition.
+    if(!video.paused)return;
     const promise =
       video.play();
 
@@ -8132,8 +8134,9 @@ body{
     const staticMode=root.classList.contains("m7-media-static") ||
       navigator.connection?.saveData===true ||
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    // Static mode still prepares ALL nearby thumbnails, with one decoder at a time.
-    visible.forEach(video=>{ensurePreviewSource(video);primePreviewFrame(video)});
+    // Queue ALL nearby stills, but attach each source only when its decoder
+    // turn starts. Eager attachment here starts parallel metadata downloads.
+    visible.forEach(primePreviewFrame);
     all.forEach(video=>{
       if(!visiblePreviewVideos.has(video)){releasePreviewSource(video);return}
       if(previewPrimeActive?.video===video)return;
