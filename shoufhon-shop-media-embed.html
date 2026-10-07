@@ -3643,6 +3643,9 @@ body{
   let cardMotionObserver =
     null;
 
+  let previewVideos =
+    [];
+
   const visiblePreviewVideos =
     new Set();
 
@@ -8109,7 +8112,8 @@ body{
 
 
   function syncPreviewPlayback(){
-    const all=Array.from(root.querySelectorAll("[data-preview-video]"));
+    const all=previewVideos.filter(video=>video.isConnected);
+    if(all.length!==previewVideos.length)previewVideos=all;
     if(viewerOpen || previewCovered || mediaPageAway || document.hidden || root.closest(".m7-native-offscreen") || window.ShoufHonEmbedVisibility?.visible===false){
       clearTimeout(previewPrimeRetryTimer);previewPrimeRetryTimer=null;
       all.forEach(releasePreviewSource);
@@ -8265,13 +8269,12 @@ body{
     visiblePreviewVideos.clear();
 
 
-    root
-      .querySelectorAll(
-        "[data-preview-video]"
-      )
+    previewVideos
       .forEach(
         releasePreviewSource
       );
+
+    previewVideos=[];
 
   }
 
@@ -8281,12 +8284,15 @@ body{
     disconnectPreviewObserver();
 
 
-    const videos =
+    previewVideos =
       Array.from(
         root.querySelectorAll(
           "[data-preview-video]"
         )
       );
+
+    const videos =
+      previewVideos;
 
 
     if(
