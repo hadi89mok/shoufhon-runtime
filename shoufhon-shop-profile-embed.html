@@ -5503,6 +5503,33 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
     const a78 = ma7alakStoryRgba(rgb,.78);
 
 
+    /*
+       Shop Label has its own Studio color and must not inherit the Story /
+       profile-ring accent. This legacy accent renderer is refreshed after
+       profile loads and live previews, so it must respect the same canonical
+       Shop Label color as shoufhon-profile-identity-effects.js.
+    */
+    const shopLabelTextColor =
+      (
+        /^#[0-9a-f]{6}$/i.test(
+          String(
+            options.shop_label_text_color ||
+            ""
+          ).trim()
+        )
+          ? String(
+              options.shop_label_text_color
+            ).trim()
+          : accent
+      );
+
+    const shopLabelTextRgb =
+      ma7alakStoryHexToRgb(
+        shopLabelTextColor
+      ) ||
+      rgb;
+
+
     const shopNameColor =
       (
         /^#[0-9a-f]{6}$/i.test(
@@ -5682,20 +5709,14 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
       }
 
       html body #ma7alak-shop-identity #ma7alak-shop-category-text{
-        color:${light}!important;
-        background:
-          linear-gradient(
-            100deg,
-            ${light} 0%,
-            ${soft} 28%,
-            #ffffff 48%,
-            ${accent} 68%,
-            ${light} 100%
-          )!important;
-        -webkit-background-clip:text!important;
-        background-clip:text!important;
-        -webkit-text-fill-color:transparent!important;
-        text-shadow:0 0 10px ${a18}!important;
+        color:${shopLabelTextColor}!important;
+        background:none!important;
+        background-image:none!important;
+        -webkit-background-clip:border-box!important;
+        background-clip:border-box!important;
+        -webkit-text-fill-color:${shopLabelTextColor}!important;
+        text-shadow:
+          0 0 10px ${ma7alakStoryRgba(shopLabelTextRgb,.18)}!important;
       }
 
       html body #ma7alak-shop-identity .ma7alak-shop-identity-line{
