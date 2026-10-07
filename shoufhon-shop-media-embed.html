@@ -8115,8 +8115,11 @@ body{
       all.forEach(releasePreviewSource);
       return;
     }
-    const visible=all.filter(video=>visiblePreviewVideos.has(video))
-      .sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);
+    const visible=all
+      .filter(video=>visiblePreviewVideos.has(video))
+      .map(video=>({video,top:video.getBoundingClientRect().top}))
+      .sort((a,b)=>a.top-b.top)
+      .map(item=>item.video);
     const staticMode=root.classList.contains("m7-media-static") ||
       navigator.connection?.saveData===true ||
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -8155,14 +8158,18 @@ body{
   // all cards on normal scroll. Embed documents retain parent clipping.
   const uncertainMotionCards=new Set();
   let cardMotionFrame=0;
-  function cardNearViewport(card){
+  function cardNearViewport(card,trackRects){
     const rect=card.getBoundingClientRect();
     const height=window.innerHeight||document.documentElement.clientHeight||0;
     const width=window.innerWidth||document.documentElement.clientWidth||0;
     if(!rect.width||!rect.height||rect.bottom < -260||rect.top > height+260||rect.right<=0||rect.left>=width)return false;
     const track=card.closest(".m7-media-track");
     if(track){
-      const clip=track.getBoundingClientRect();
+      let clip=trackRects?.get(track);
+      if(!clip){
+        clip=track.getBoundingClientRect();
+        trackRects?.set(track,clip);
+      }
       if(rect.right<=clip.left||rect.left>=clip.right)return false;
     }
     return true;
@@ -8171,8 +8178,9 @@ body{
     if(!uncertainMotionCards.size||cardMotionFrame)return;
     cardMotionFrame=requestAnimationFrame(()=>{
       cardMotionFrame=0;
+      const trackRects=new Map();
       uncertainMotionCards.forEach(card=>{
-        const near=card.isConnected&&cardNearViewport(card);
+        const near=card.isConnected&&cardNearViewport(card,trackRects);
         card.classList.toggle("m7-media-motion-sleep",!near);
         if(!near)uncertainMotionCards.delete(card);
       });
@@ -8213,10 +8221,11 @@ body{
     cardMotionObserver =
       new IntersectionObserver(
         function(entries){
+          const trackRects=new Map();
           entries.forEach(function(entry){
             entry.target.classList.toggle(
               "m7-media-motion-sleep",
-              !entry.isIntersecting && !(window.self===window.top&&cardNearViewport(entry.target))
+              !entry.isIntersecting && !(window.self===window.top&&cardNearViewport(entry.target,trackRects))
             );
             if(!entry.isIntersecting&&!entry.target.classList.contains("m7-media-motion-sleep"))uncertainMotionCards.add(entry.target);
             else uncertainMotionCards.delete(entry.target);
