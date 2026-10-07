@@ -13671,6 +13671,7 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
       banner.classList.toggle("visible",enabled);
       shell.classList.toggle("m7-profile-has-banner",enabled);
       banner.toggleAttribute("data-solid-banner",!url);
+      window.ShoufHonBannerMedia?.apply(banner,o);
       banner.style.setProperty("background-color",color,"important");
       banner.classList.toggle("m7-banner-straight",styleName==="straight");
       banner.classList.toggle("m7-banner-rounded",styleName==="rounded");
@@ -13704,4 +13705,5 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
   schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
 })();
 </script>
+
 
