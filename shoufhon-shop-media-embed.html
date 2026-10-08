@@ -8097,7 +8097,7 @@ body{
       !root.closest(".m7-native-offscreen") && window.ShoufHonEmbedVisibility?.visible !== false;
   }
 
-  function releasePreviewSource(video){
+  function releasePreviewSource(video,unload=false){
     if(!video)return;
     const index=previewPrimeQueue.indexOf(video);
     if(index>=0)previewPrimeQueue.splice(index,1);
@@ -8105,7 +8105,10 @@ body{
     else delete video.dataset.m7PrimePending;
     pausePreview(video);
     // Keep the decoded still and attached source when leaving the viewport.
-    try{video.preload="metadata"}catch(_){}
+    try{
+      video.preload=unload?"none":"metadata";
+      if(unload&&video.getAttribute("src")){video.removeAttribute("src");video.load();delete video.dataset.m7SourceLoaded;delete video.dataset.m7FramePrimed;}
+    }catch(_){}
   }
 
   function primePreviewFrame(video){
@@ -8288,9 +8291,10 @@ body{
   function syncPreviewPlayback(){
     const all=previewVideos.filter(video=>video.isConnected);
     if(all.length!==previewVideos.length)previewVideos=all;
-    if(viewerOpen || previewCovered || mediaPageAway || document.hidden || root.closest(".m7-native-offscreen") || window.ShoufHonEmbedVisibility?.visible===false){
+    const restricted=!!window.ShoufHonVideoDelivery&&window.ShoufHonVideoDelivery.neighborPreload()!=="auto";
+    if(viewerOpen || previewCovered || mediaPageAway || document.hidden || root.closest(".m7-native-offscreen") || window.ShoufHonEmbedVisibility?.visible===false || restricted){
       clearTimeout(previewPrimeRetryTimer);previewPrimeRetryTimer=null;
-      all.forEach(releasePreviewSource);
+      all.forEach(video=>releasePreviewSource(video,restricted));
       return;
     }
     const visible=all
@@ -8312,6 +8316,8 @@ body{
     });
     drainPreviewPrimeQueue();
   }
+
+  window.addEventListener?.("shoufhon:video-connection-change",syncPreviewPlayback);
 
   function disconnectCardMotionObserver(){
 
@@ -15256,5 +15262,6 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
