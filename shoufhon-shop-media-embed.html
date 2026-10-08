@@ -2740,6 +2740,8 @@ body{
 #m7-media-viewer .m7c-author-row{flex-wrap:wrap}
 @media(max-height:600px){#m7-media-viewer .m7v-social{gap:7px;bottom:max(52px,env(safe-area-inset-bottom))}#m7-media-viewer .m7v-social-action{min-height:48px}}
 
+/* Avoid blurred action silhouettes sweeping behind the opening sheet. */
+#m7-media-viewer.comments-open .m7v-social{visibility:hidden;pointer-events:none}
 /* COMMENTS BOTTOM SHEET */
 #m7-media-viewer .m7c-sheet{
   position:absolute;
@@ -10205,6 +10207,7 @@ body{
 
     commentsOpen =
       true;
+    viewer.classList.add("comments-open");
 
     commentsSheet.classList.add(
       "open"
@@ -10291,6 +10294,7 @@ body{
 
   function closeComments(){
     window.ShoufHonCommentReactions?.close();
+    viewer?.classList.remove("comments-open");
 
     commentsOpen =
       false;
