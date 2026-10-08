@@ -3032,7 +3032,7 @@ body{
   border:0;
   background:transparent;
   color:rgba(255,255,255,.56);
-  font:800 10px/1 Arial,"Segoe UI",sans-serif;
+  font:800 12px/1 Arial,"Segoe UI",sans-serif;
   cursor:pointer;
 }
 .m7c-mini-action.liked{color:#ff5e78}
@@ -9691,7 +9691,7 @@ body{
             type="button"
             data-comment-like="${row.id}"
           >
-            ${row.liked_by_me === true ? "Liked" : "Like"}${likeCount ? " · " + likeCount : ""}
+            ${esc(window.ShoufHonCommentReactions?.label(row) || (row.liked_by_me ? "Liked" : "Like"))}${likeCount ? " · " + likeCount : ""}${window.ShoufHonCommentReactions?.summary(row) ? " " + window.ShoufHonCommentReactions.summary(row) : ""}
           </button>
 
           <button
@@ -10290,6 +10290,7 @@ body{
 
 
   function closeComments(){
+    window.ShoufHonCommentReactions?.close();
 
     commentsOpen =
       false;
@@ -10683,7 +10684,7 @@ body{
 
 
   async function toggleCommentLike(
-    commentId
+    commentId, reaction
   ){
 
     const account =
@@ -10728,8 +10729,9 @@ body{
 
       const result =
         await mediaRpc(
-          "ma7alak_toggle_media_comment_like",
+          "shoufhon_set_media_comment_reaction",
           {
+            p_reaction: reaction === undefined ? (row.liked_by_me ? null : "like") : reaction,
             p_comment_id:
               Number(
                 commentId
@@ -10750,6 +10752,8 @@ body{
             );
 
 
+      row.my_reaction=state.my_reaction || null;
+      row.reaction_counts=state.reaction_counts || {};
       row.liked_by_me =
         state.liked ===
           true;
@@ -11625,6 +11629,7 @@ body{
           event.preventDefault();
           event.stopPropagation();
 
+          if(window.ShoufHonCommentReactions?.consume(like))return;
           toggleCommentLike(
             like.getAttribute(
               "data-comment-like"
@@ -11712,6 +11717,8 @@ body{
     );
 
 
+  window.ShoufHonCommentReactions?.bind(commentsList,"[data-comment-like]",(button,kind)=>toggleCommentLike(button.getAttribute("data-comment-like"),kind));
+
   let longPressStartX =
     0;
 
@@ -11724,6 +11731,7 @@ body{
       "pointerdown",
       function(event){
 
+        if(event.target.closest("[data-comment-like],[data-comment-reply]"))return;
         const rowNode =
           event.target.closest(
             '[data-comment-manage="1"]'
@@ -12427,6 +12435,7 @@ body{
 
 
   function clearViewerMedia(){
+    window.ShoufHonCommentReactions?.close();
     clearPhotoPreview();
 
     viewerMediaLoadToken +=
