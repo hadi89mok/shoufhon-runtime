@@ -6669,6 +6669,19 @@ body{
           }
         );
 
+      const userState=await accountState(false);
+      let guestLikeKeys=new Set();
+      if(!userState.loggedIn){
+        const token=guestMediaLikeToken();
+        if(token){
+          const response=await (window.Ma7alakAccount?.client||supabaseClient).rpc(
+            "shoufhon_guest_media_like_state",{p_shop_slug:SHOP_SLUG,p_guest_token:token}
+          );
+          if(!response.error&&Array.isArray(response.data)){
+            guestLikeKeys=new Set(response.data.filter(row=>row.liked).map(row=>mediaKey(row.media_type,row.media_id)));
+          }
+        }
+      }
       engagementMap.clear();
 
       (
@@ -6709,8 +6722,7 @@ body{
                     )
                   ),
                 liked_by_me:
-                  row.liked_by_me ===
-                    true,
+                  userState.loggedIn ? row.liked_by_me === true : guestLikeKeys.has(key),
                 last_activity_at:
                   row.last_activity_at ||
                   null
@@ -9070,6 +9082,20 @@ body{
   }
 
 
+  // Anonymous likes only. Comments continue using the authenticated RPCs.
+  function guestMediaLikeToken(){
+    const key="shoufhon_guest_media_like_token_v1";
+    try {
+      let token=localStorage.getItem(key)||"";
+      if(/^[A-Za-z0-9._:-]{32,200}$/.test(token))return token;
+      const bytes=new Uint8Array(24);
+      crypto.getRandomValues(bytes);
+      token=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+      localStorage.setItem(key,token);
+      return token;
+    }catch(_){return "";}
+  }
+
   async function toggleCurrentMediaLike(){
 
     const item =
@@ -9095,16 +9121,9 @@ body{
         true
       );
 
-    if(
-      !account.loggedIn
-    ){
-
-      requestLogin();
-
-      socialToast(
-        "Log in to like photos and videos."
-      );
-
+    const guestToken=!account.loggedIn?guestMediaLikeToken():"";
+    if(!account.loggedIn&&!guestToken){
+      socialToast("Could not save this like. Please retry.");
       return;
     }
 
@@ -9181,20 +9200,24 @@ body{
 
     try{
 
-      const result =
-        await mediaRpc(
-          "ma7alak_toggle_media_like",
-          {
-            p_shop_slug:
-              SHOP_SLUG,
-            p_media_type:
-              item.type,
-            p_media_id:
-              Number(
-                item.sourceId
-              )
-          }
-        );
+      let result;
+      if(account.loggedIn){
+        result=await mediaRpc("ma7alak_toggle_media_like",{
+          p_shop_slug:SHOP_SLUG,
+          p_media_type:item.type,
+          p_media_id:Number(item.sourceId)
+        });
+      }else{
+        const response=await (window.Ma7alakAccount?.client||supabaseClient).rpc(
+          "shoufhon_guest_toggle_media_like",{
+            p_shop_slug:SHOP_SLUG,
+            p_media_type:item.type,
+            p_media_id:Number(item.sourceId),
+            p_guest_token:guestToken
+          });
+        if(response.error)throw response.error;
+        result=response.data;
+      }
 
 
       const row =
