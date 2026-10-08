@@ -5651,6 +5651,17 @@ body{
   }
 
 
+  // Keep original URLs for social actions/shares; only the player uses copies.
+  function galleryPlaybackUrl(row){
+    if(row.playback_source_url!==row.video_url)return "";
+    try{
+      const u=new URL(row.playback_url||"");
+      return u.origin==="https://wdtaiuwtqdepzdamgsrs.supabase.co" &&
+        u.pathname.startsWith("/storage/v1/object/public/shop-videos/gallery-playback/v1/") &&
+        !u.search && !u.hash ? u.href : "";
+    }catch(_){return ""}
+  }
+
   function sortedVideos(rows){
 
     return (
@@ -5713,6 +5724,7 @@ body{
           return {
             type:"video",
             poster:String(item.poster_url||"").trim(),
+            playbackUrl:galleryPlaybackUrl(item),
             id:
               "video-" +
               String(item.id),
@@ -7501,7 +7513,7 @@ body{
         'preload="metadata" ' +
         'data-preview-video ' +
         'data-video-src="' +
-          esc(item.url) +
+          esc(item.playbackUrl||item.url) +
         '"' +
       '></video>'
     );
@@ -8306,7 +8318,7 @@ body{
     const restricted=!!window.ShoufHonVideoDelivery&&window.ShoufHonVideoDelivery.neighborPreload()!=="auto";
     if(viewerOpen || previewCovered || mediaPageAway || document.hidden || root.closest(".m7-native-offscreen") || window.ShoufHonEmbedVisibility?.visible===false || restricted){
       clearTimeout(previewPrimeRetryTimer);previewPrimeRetryTimer=null;
-      all.forEach(video=>releasePreviewSource(video,restricted));
+      all.forEach(video=>releasePreviewSource(video,restricted || viewerOpen));
       return;
     }
     const visible=all
@@ -12673,7 +12685,7 @@ function whatsappNumber(raw){
           try{
 
             const promise =
-              viewerVideo.play();
+              document.hidden ? null : viewerVideo.play();
 
             if(
               promise &&
@@ -12693,6 +12705,7 @@ function whatsappNumber(raw){
         };
 
 
+      let originalRetried=false;
       const failVideo =
         function(){
 
@@ -12703,13 +12716,15 @@ function whatsappNumber(raw){
             return;
           }
 
-          setViewerLoading(
-            false
-          );
-
-          viewerVideo.classList.add(
-            "m7-ready"
-          );
+          // A missing/invalid copy falls back exactly once to the original.
+          if(item.playbackUrl&&!originalRetried){
+            originalRetried=true;
+            viewerVideo.src=item.url;
+            try{viewerVideo.load();viewerVideo.play()?.catch(()=>{})}catch(_){}
+            return;
+          }
+          setViewerLoading(false);
+          viewerVideo.classList.add("m7-ready");
 
         };
 
@@ -12724,7 +12739,7 @@ function whatsappNumber(raw){
         failVideo;
 
       viewerVideo.src =
-        item.url;
+        item.playbackUrl || item.url;
 
 
       try{
@@ -14161,6 +14176,8 @@ function whatsappNumber(raw){
                 row.id,
                 row.video_url,
                 row.poster_url,
+                row.playback_url,
+                row.playback_source_url,
                 row.sort_order,
                 row.created_at
               ];
@@ -14252,7 +14269,7 @@ function whatsappNumber(raw){
               "shop_videos"
             )
             .select(
-              "id,video_url,poster_url,sort_order,created_at"
+              "id,video_url,poster_url,playback_url,playback_source_url,sort_order,created_at"
             )
             .eq(
               "shop_slug",
@@ -15285,6 +15302,7 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
 
