@@ -9352,6 +9352,10 @@ body{
   }
 
 
+  window.addEventListener("ma7alak:owner-auth-change",()=>{
+    if(commentsOpen&&!document.hidden)syncCommentComposerAccount(false).catch(()=>{});
+  });
+
   async function syncCommentComposerAccount(
     force
   ){
@@ -9378,9 +9382,16 @@ body{
       commentMe
     ){
 
-      const user =
-        account.user ||
-        {};
+      let ownerAuth=window.Ma7alakOwnerAuth;
+      try{ownerAuth=ownerAuth||window.parent?.Ma7alakOwnerAuth;}catch(_){}
+      try{await ownerAuth?.ready?.();}catch(_){}
+      const personal=account.user||{};
+      const assigned=account.loggedIn&&personal.id&&ownerAuth?.user?.id===personal.id?ownerAuth.owner:null;
+      const shop=assigned?ownerAuth.shop:null;
+      const user=assigned?{
+        display_name:shop?.shop_name||assigned.shop_slug||"Shop owner",
+        avatar_url:shop?.profile_image_url||shop?.story_logo_url||""
+      }:personal;
 
       const name =
         String(
@@ -9403,7 +9414,7 @@ body{
       ){
 
         commentMe.innerHTML =
-          `<img src="${esc(avatar)}" alt="">`;
+          `<img src="${esc(avatar)}" alt="" decoding="async">`;
 
       }
       else{
@@ -15363,6 +15374,7 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
 
