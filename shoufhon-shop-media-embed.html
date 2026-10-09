@@ -14928,6 +14928,7 @@ function whatsappNumber(raw){
     window.ShoufHonFeedMedia={
       async open(post,item,comments){
         if(viewerOpen)await closeMedia({fromPortalBack:true});
+        if(engagementLoadPromise)await engagementLoadPromise;
         SHOP_SLUG=String(post.shop_slug||"");
         root.setAttribute("data-shop-slug",SHOP_SLUG);
         engagementMap.clear();
