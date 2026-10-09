@@ -3402,7 +3402,8 @@ body{
   }
 
 
-  const SHOP_SLUG =
+  const feedMode = window.ShoufHonFeedMediaMode === true;
+  let SHOP_SLUG = feedMode ? "feed" :
     await window.ShoufHonShopContextClient.resolve({
       explicit:String(document.getElementById("m7-media-showcase")?.getAttribute("data-shop-slug") || "").trim(),
       fallback:resolveShopSlug,
@@ -3644,6 +3645,7 @@ body{
 
 
   const supabaseClient =
+    window.Ma7alakAccount?.client || window.__MA7ALAK_SHARED_SUPABASE_CLIENT__ ||
     window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_PUBLISHABLE_KEY
@@ -6769,7 +6771,7 @@ body{
   }
 
 
-  function mediaSectionAwake(){return !document.hidden&&window.ShoufHonEmbedVisibility?.visible!==false;}
+  function mediaSectionAwake(){return !document.hidden&&(!feedMode || viewerOpen)&&window.ShoufHonEmbedVisibility?.visible!==false;}
 
   function scheduleSocialRefresh(){
     if(!mediaSectionAwake())return;
@@ -13014,6 +13016,7 @@ function whatsappNumber(raw){
 
 
   async function enterViewport(){
+    if(feedMode){window.ShoufHonFeedViewport?.open();return;}
 
     if(window.ShoufHonNativeShopTest){
       window.ShoufHonNativeShopUI?.openViewport("media-viewer");
@@ -13457,11 +13460,17 @@ function whatsappNumber(raw){
 
 
     syncPreviewPlayback();
+    if(feedMode){
+      if(mediaRealtime){supabaseClient.removeChannel(mediaRealtime);mediaRealtime=null;}
+      clearTimeout(socialRefreshTimer);
+      window.dispatchEvent(new CustomEvent("shoufhon:feed-viewer-closed",{detail:{shopSlug:SHOP_SLUG}}));
+    }
 
   }
 
 
   async function closeMedia(options={}){
+    if(feedMode && viewerOpen)window.ShoufHonFeedViewport?.close(options.fromPortalBack===true);
 
     if(window.ShoufHonNativeShopTest&&viewerOpen){
       window.ShoufHonNativeShopUI?.closeViewport("media-viewer",options.fromPortalBack===true);
@@ -14914,6 +14923,37 @@ function whatsappNumber(raw){
      BOOT
   ========================================================= */
 
+  if(feedMode){
+    root.style.display="none";
+    window.ShoufHonFeedMedia={
+      async open(post,item,comments){
+        if(viewerOpen)await closeMedia({fromPortalBack:true});
+        SHOP_SLUG=String(post.shop_slug||"");
+        root.setAttribute("data-shop-slug",SHOP_SLUG);
+        engagementMap.clear();
+        allMedia=post.media.filter(m=>["photo","video"].includes(m.type)).map((m,i)=>({
+          type:m.type,id:m.type+"-"+m.id,sourceId:Number(m.id),url:validUrl(m.url)?m.url:"",
+          poster:validUrl(m.poster)?m.poster:"",sort:i,featured:false,createdAt:post.published_at
+        }));
+        allPhotoMedia=allMedia.filter(m=>m.type==="photo");allVideoMedia=allMedia.filter(m=>m.type==="video");
+        for(const m of post.media)engagementMap.set(mediaKey(m.type,m.id),{like_count:m.like_count||0,comment_count:m.comment_count||0,liked_by_me:m.liked===true});
+        profileOptions={};mediaCommentsEnabled=true;
+        const opened=await openExactMedia(item.type,item.id,{comments:false});
+        if(!opened)throw Error("Media unavailable");
+        const profile=await supabaseClient.from("shop_profiles").select("directory_options").eq("shop_slug",SHOP_SLUG).maybeSingle();
+        if(!profile.error)profileOptions=profile.data?.directory_options||{};
+        mediaCommentsEnabled=profileOptions.media_comments_enabled!==false;
+        if(comments&&viewerOpen)await openComments({});
+        loadEngagementState();
+        if(viewerOpen)mediaRealtime=supabaseClient.channel("shoufhon-feed-open-media").on("postgres_changes",{event:"*",schema:"public",table:"shop_media_engagement",filter:"shop_slug=eq."+SHOP_SLUG},scheduleSocialRefresh).subscribe();
+      },
+      back(){if(commentsOpen){closeComments();return "comments";}if(viewerOpen){closeMedia({fromPortalBack:true});return "viewer";}return "closed";},
+      close(){return closeMedia({fromPortalBack:true});}
+    };
+    window.dispatchEvent(new Event("shoufhon:feed-media-ready"));
+    return;
+  }
+
   loading.hidden =
     false;
 
@@ -15315,6 +15355,7 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
 
