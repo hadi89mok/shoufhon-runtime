@@ -10207,6 +10207,7 @@ body{
       {};
 
 
+    if(feedMode)window.ShoufHonFeedViewport?.commentsOpened();
     commentsOpen =
       true;
     viewer.classList.add("comments-open");
@@ -10295,6 +10296,7 @@ body{
 
 
   function closeComments(){
+    if(feedMode&&commentsOpen&&viewerOpen)window.ShoufHonFeedViewport?.commentsClosed();
     window.ShoufHonCommentReactions?.close();
     viewer?.classList.remove("comments-open");
 
@@ -12963,6 +12965,7 @@ function whatsappNumber(raw){
   let mediaReturnState = null;
 
   function captureMediaReturnPosition(){
+    if(feedMode)return;
 
     /*
       IMPORTANT PHONE RULE:
@@ -13447,13 +13450,10 @@ function whatsappNumber(raw){
     viewerAlbum = null;
 
 
-    document.documentElement
-      .style.overflow =
-        "";
-
-    document.body
-      .style.overflow =
-        "";
+    if(!feedMode){
+      document.documentElement.style.overflow="";
+      document.body.style.overflow="";
+    }
 
 
     restoreMediaReturnPosition();
