@@ -13470,6 +13470,7 @@ function whatsappNumber(raw){
 
 
   async function closeMedia(options={}){
+    if(feedMode)feedOpenGeneration++;
     if(feedMode && viewerOpen)window.ShoufHonFeedViewport?.close(options.fromPortalBack===true);
 
     if(window.ShoufHonNativeShopTest&&viewerOpen){
@@ -14923,12 +14924,15 @@ function whatsappNumber(raw){
      BOOT
   ========================================================= */
 
+  let feedOpenGeneration=0;
   if(feedMode){
     root.style.display="none";
     window.ShoufHonFeedMedia={
       async open(post,item,comments){
         if(viewerOpen)await closeMedia({fromPortalBack:true});
+        const generation=++feedOpenGeneration;
         if(engagementLoadPromise)await engagementLoadPromise;
+        if(generation!==feedOpenGeneration)return;
         SHOP_SLUG=String(post.shop_slug||"");
         root.setAttribute("data-shop-slug",SHOP_SLUG);
         engagementMap.clear();
@@ -14940,11 +14944,14 @@ function whatsappNumber(raw){
         for(const m of post.media)engagementMap.set(mediaKey(m.type,m.id),{like_count:m.like_count||0,comment_count:m.comment_count||0,liked_by_me:m.liked===true});
         profileOptions={};mediaCommentsEnabled=true;
         const opened=await openExactMedia(item.type,item.id,{comments:false});
+        if(generation!==feedOpenGeneration||!viewerOpen)return;
         if(!opened)throw Error("Media unavailable");
         const profile=await supabaseClient.from("shop_profiles").select("directory_options").eq("shop_slug",SHOP_SLUG).maybeSingle();
+        if(generation!==feedOpenGeneration||!viewerOpen)return;
         if(!profile.error)profileOptions=profile.data?.directory_options||{};
         mediaCommentsEnabled=profileOptions.media_comments_enabled!==false;
         if(comments&&viewerOpen)await openComments({});
+        if(generation!==feedOpenGeneration||!viewerOpen)return;
         loadEngagementState();
         if(viewerOpen)mediaRealtime=supabaseClient.channel("shoufhon-feed-open-media").on("postgres_changes",{event:"*",schema:"public",table:"shop_media_engagement",filter:"shop_slug=eq."+SHOP_SLUG},scheduleSocialRefresh).subscribe();
       },
