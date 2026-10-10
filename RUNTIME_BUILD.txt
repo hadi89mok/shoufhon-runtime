@@ -1,4 +1,4 @@
 ShoufHon public browser runtime. Generated from the private/source repository.
-Source commit: 81b8b83da560566989a3cb8746d6d386497a27b7
+Source commit: 9802ec313b527b8094c510ea8728f662c32070a8
 JavaScript is production-minified; source maps are intentionally not published.
 Server-side source, SQL migrations, tests, and Supabase functions are intentionally excluded.

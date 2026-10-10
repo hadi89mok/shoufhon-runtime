@@ -9026,8 +9026,8 @@ body{
     if(
       viewerLikeCount
     ){
-      viewerLikeCount.textContent =
-        likes;
+      viewerLikeCount.textContent = likes>0?likes:(window.ShoufHonFreshContent?.likesLabel(0)||"Be the first to like");
+      viewerLikeCount.style.cssText=likes>0?"":"max-width:68px;white-space:normal;font-size:10px;line-height:1.2";
     }
 
     if(
@@ -9035,6 +9035,7 @@ body{
     ){
       viewerCommentCount.textContent =
         comments;
+      viewerCommentCount.hidden=comments===0;
     }
 
     if(
@@ -15365,6 +15366,7 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
 
