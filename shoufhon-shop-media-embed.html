@@ -13723,6 +13723,8 @@ function whatsappNumber(raw){
 
   function nextMedia(){
 
+    if(viewerMedia.length < 2)return;
+
     showMedia(
       currentIndex + 1,
       "next"
@@ -13732,6 +13734,8 @@ function whatsappNumber(raw){
 
 
   function previousMedia(){
+
+    if(viewerMedia.length < 2)return;
 
     showMedia(
       currentIndex - 1,
@@ -13784,11 +13788,11 @@ function whatsappNumber(raw){
      PHONE-FIRST MEDIA NAVIGATION
 
      - swipe left/right on photos OR videos
-     - tap/click left half = previous
-     - tap/click right half = next
+     - photo tap/click left half = previous
+     - photo tap/click right half = next
+     - video taps belong to native playback controls and never navigate
      - arrows are hidden; they are no longer required
-     - only the small native video-control strip at the bottom is protected
-       from tap navigation so play/progress controls remain usable
+     - the entire video surface is protected from tap navigation
   */
   let swipeTracking =
     false;
@@ -13800,6 +13804,9 @@ function whatsappNumber(raw){
   function viewerTapDirection(
     clientX
   ){
+
+    // Let native controls reveal themselves without reloading or pausing.
+    if(viewerVideo.classList.contains("active"))return;
 
     const rect =
       viewerStage
