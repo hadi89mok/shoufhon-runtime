@@ -14937,6 +14937,10 @@ function whatsappNumber(raw){
 
   let feedOpenGeneration=0;
   if(feedMode){
+    // Keep footer labels and swipe guidance out of homepage feed viewing only.
+    const feedViewerStyle=document.createElement("style");
+    feedViewerStyle.textContent="#m7-media-viewer #m7v-hint,#m7-media-viewer #m7v-album-meta{display:none!important}";
+    document.head.appendChild(feedViewerStyle);
     root.style.display="none";
     window.ShoufHonFeedMedia={
       async open(post,item,comments){
