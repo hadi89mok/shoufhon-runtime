@@ -5747,7 +5747,7 @@ body{
                 0
               ),
 
-            featured:false,
+            featured:item.is_featured===true,
 
             createdAt:
               String(
@@ -7177,37 +7177,16 @@ body{
 
 
     /*
-      Preserve featured-photo behavior. If that photo lives inside an album,
+      Preserve featured-media behavior. If that media lives inside an album,
       the album frame becomes the featured hero instead of duplicating it.
     */
-    const featuredPhoto =
-      photos.find(
-        function(item){
-          return item.featured;
-        }
-      ) ||
-      null;
-
-
-    if(featuredPhoto){
-
-      const remainingPhotos =
-        photos.filter(
-          function(item){
-            return item.id !== featuredPhoto.id;
-          }
-        );
-
-      allMedia =
-        [
-          featuredPhoto,
-          ...interleave(
-            remainingPhotos,
-            videos,
-            "video"
-          )
-        ];
-
+    const featuredMedia = photos.find(item=>item.featured)||videos.find(item=>item.featured)||null;
+    if(featuredMedia){
+      allMedia=[featuredMedia,...interleave(
+        photos.filter(item=>item.id!==featuredMedia.id),
+        videos.filter(item=>item.id!==featuredMedia.id),
+        featuredMedia.type==="video"?"photo":"video"
+      )];
     }
     else{
 
@@ -14219,6 +14198,7 @@ function whatsappNumber(raw){
                 row.poster_url,
                 row.playback_url,
                 row.playback_source_url,
+                row.is_featured,
                 row.sort_order,
                 row.created_at
               ];
@@ -14310,7 +14290,7 @@ function whatsappNumber(raw){
               "shop_videos"
             )
             .select(
-              "id,video_url,poster_url,playback_url,playback_source_url,sort_order,created_at"
+              "id,video_url,poster_url,playback_url,playback_source_url,sort_order,is_featured,created_at"
             )
             .eq(
               "shop_slug",
