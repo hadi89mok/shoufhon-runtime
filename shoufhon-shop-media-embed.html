@@ -6660,6 +6660,7 @@ body{
   }
 
 
+  let guestLikeStateShop="";
   async function loadEngagementState(){
 
     if(engagementLoadPromise){
@@ -6693,9 +6694,12 @@ body{
           const response=await (window.Ma7alakAccount?.client||supabaseClient).rpc(
             "shoufhon_guest_media_like_state",{p_shop_slug:SHOP_SLUG,p_guest_token:token}
           );
-          if(!response.error&&Array.isArray(response.data)){
-            guestLikeKeys=new Set(response.data.filter(row=>row.liked).map(row=>mediaKey(row.media_type,row.media_id)));
-          }
+          // Retain the previous engagement map when the network cannot restore
+          // guest likes. An error must never be rendered as "not liked".
+          if(response.error)throw response.error;
+          if(!Array.isArray(response.data))throw Error("Guest likes are temporarily unavailable.");
+          guestLikeKeys=new Set(response.data.filter(row=>row.liked).map(row=>mediaKey(row.media_type,row.media_id)));
+          guestLikeStateShop=SHOP_SLUG;
         }
       }
       engagementMap.clear();
@@ -9121,6 +9125,13 @@ body{
     if(!account.loggedIn&&!guestToken){
       socialToast("Could not save this like. Please retry.");
       return;
+    }
+    if(!account.loggedIn&&guestLikeStateShop!==SHOP_SLUG){
+      await loadEngagementState();
+      if(guestLikeStateShop!==SHOP_SLUG||currentViewerItem()!==item){
+        socialToast("Reconnect to restore your likes, then try again.");
+        return;
+      }
     }
 
 
@@ -12092,6 +12103,7 @@ body{
     if(document.hidden)cancelPendingPhotoWarmups();
     else warmAdjacentMedia();
   });
+  window.addEventListener("online",()=>{if(!document.hidden&&SHOP_SLUG)scheduleSocialRefresh();});
 
   function resolveKeyboardViewport(){
 
@@ -14938,7 +14950,7 @@ function whatsappNumber(raw){
         if(generation!==feedOpenGeneration)return;
         SHOP_SLUG=String(post.shop_slug||"");
         root.setAttribute("data-shop-slug",SHOP_SLUG);
-        engagementMap.clear();
+        engagementMap.clear();guestLikeStateShop="";
         allMedia=post.media.filter(m=>["photo","video"].includes(m.type)).map((m,i)=>({
           type:m.type,id:m.type+"-"+m.id,sourceId:Number(m.id),url:validUrl(m.url)?m.url:"",
           poster:validUrl(m.poster)?m.poster:"",sort:i,featured:false,createdAt:post.published_at
