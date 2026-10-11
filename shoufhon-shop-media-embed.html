@@ -5656,6 +5656,23 @@ body{
 
 
   // Keep original URLs for social actions/shares; only the player uses copies.
+  async function feedPlaybackMedia(media,slug){
+    const ids=[...new Set(media.filter(item=>item.type==="video").map(item=>item.sourceId))];
+    if(!ids.length)return media;
+    try{
+      const result=await supabaseClient.from("shop_videos")
+        .select("id,video_url,playback_url,playback_source_url")
+        .eq("shop_slug",slug).in("id",ids);
+      if(result.error)return media;
+      const rows=new Map((result.data||[]).map(row=>[Number(row.id),row]));
+      return media.map(item=>{
+        const row=rows.get(item.sourceId);
+        return item.type==="video"&&row?.video_url===item.url
+          ? {...item,playbackUrl:galleryPlaybackUrl(row)} : item;
+      });
+    }catch(_){return media}
+  }
+
   function galleryPlaybackUrl(row){
     if(row.playback_source_url!==row.video_url)return "";
     try{
@@ -14955,6 +14972,9 @@ function whatsappNumber(raw){
           type:m.type,id:m.type+"-"+m.id,sourceId:Number(m.id),url:validUrl(m.url)?m.url:"",
           poster:validUrl(m.poster)?m.poster:"",sort:i,featured:false,createdAt:post.published_at
         }));
+        const resolvedMedia=await feedPlaybackMedia(allMedia,SHOP_SLUG);
+        if(generation!==feedOpenGeneration)return;
+        allMedia=resolvedMedia;
         allPhotoMedia=allMedia.filter(m=>m.type==="photo");allVideoMedia=allMedia.filter(m=>m.type==="video");
         for(const m of post.media)engagementMap.set(mediaKey(m.type,m.id),{like_count:m.like_count||0,comment_count:m.comment_count||0,liked_by_me:m.liked===true});
         profileOptions={};mediaCommentsEnabled=true;
