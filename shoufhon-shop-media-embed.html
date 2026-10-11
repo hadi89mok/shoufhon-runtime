@@ -3694,8 +3694,8 @@ body{
   function clearPhotoPreview(){viewerPreview.onload=null;viewerPreview.onerror=null;viewerPreview.classList.remove("active");viewerPreview.removeAttribute("src")}
   function showPhotoPreview(item,token){
     const card=Array.from(root.querySelectorAll("img")).find(img=>img.dataset.shoufhonOriginal===item.url||img.getAttribute("src")===item.url);
-    const src=card?.currentSrc||card?.src||warmedImages.get(item.url)?.src||photoPreviewUrl(item);
-    if(src===item.url)return;
+    const src=item.previewUrl||card?.currentSrc||card?.src||warmedImages.get(item.url)?.src||(item.type==="video"?item.poster:photoPreviewUrl(item));
+    if(!validUrl(src)||(src===item.url&&!item.previewUrl))return;
     const reveal=()=>{if(token!==viewerMediaLoadToken)return;viewerPreview.classList.add("active");viewerPreview.style.opacity="1";setViewerLoading(false)};
     viewerPreview.onload=reveal;viewerPreview.onerror=()=>{};viewerPreview.src=src;
     if(viewerPreview.complete&&viewerPreview.naturalWidth>0)reveal();
@@ -5656,21 +5656,31 @@ body{
 
 
   // Keep original URLs for social actions/shares; only the player uses copies.
+  const feedPlaybackCache=new Map();
   async function feedPlaybackMedia(media,slug){
     const ids=[...new Set(media.filter(item=>item.type==="video").map(item=>item.sourceId))];
     if(!ids.length)return media;
+    const key=JSON.stringify([slug,media.filter(m=>m.type==="video").map(m=>[m.sourceId,m.url])]);
+    let entry=feedPlaybackCache.get(key);
+    if(!entry||Date.now()-entry.at>30000){
+      entry={at:Date.now(),promise:(async()=>{
+        const result=await supabaseClient.from("shop_videos")
+          .select("id,video_url,playback_url,playback_source_url")
+          .eq("shop_slug",slug).in("id",ids);
+        if(result.error)throw result.error;
+        return new Map((result.data||[]).map(row=>[Number(row.id),row]));
+      })()};
+      feedPlaybackCache.set(key,entry);
+      while(feedPlaybackCache.size>24)feedPlaybackCache.delete(feedPlaybackCache.keys().next().value);
+    }
     try{
-      const result=await supabaseClient.from("shop_videos")
-        .select("id,video_url,playback_url,playback_source_url")
-        .eq("shop_slug",slug).in("id",ids);
-      if(result.error)return media;
-      const rows=new Map((result.data||[]).map(row=>[Number(row.id),row]));
+      const rows=await entry.promise;
       return media.map(item=>{
         const row=rows.get(item.sourceId);
         return item.type==="video"&&row?.video_url===item.url
           ? {...item,playbackUrl:galleryPlaybackUrl(row)} : item;
       });
-    }catch(_){return media}
+    }catch(_){if(feedPlaybackCache.get(key)===entry)feedPlaybackCache.delete(key);return media}
   }
 
   function galleryPlaybackUrl(row){
@@ -12714,6 +12724,7 @@ function whatsappNumber(raw){
           viewerVideo.classList.add(
             "m7-ready"
           );
+          clearPhotoPreview();
 
           setViewerLoading(
             false
@@ -12774,6 +12785,9 @@ function whatsappNumber(raw){
 
       viewerVideo.onerror =
         failVideo;
+
+      // Keep the already-loaded feed poster visible until the first video frame.
+      if(feedMode)showPhotoPreview(item,loadToken);
 
       viewerVideo.src =
         item.playbackUrl || item.url;
@@ -12917,7 +12931,7 @@ function whatsappNumber(raw){
 
       showPhotoPreview(item,loadToken);
       viewerImage.src =
-        item.url;
+        (feedMode&&feedPhotoCopies.get(item.url)?.url)||item.url;
 
       viewerImage.classList.add(
         "active"
@@ -14953,6 +14967,52 @@ function whatsappNumber(raw){
   ========================================================= */
 
   let feedOpenGeneration=0;
+  const feedPhotoCopies=new Map(),feedWarmedVideos=new Set();
+  let feedWarmAbort=null,feedWarmKey="";
+  function stopFeedWarm(){feedWarmAbort?.abort();feedWarmAbort=null;feedWarmKey="";}
+  async function prepareFeedMedia(post,selected){
+    if(document.hidden||viewerOpen||navigator.connection?.saveData||/^(slow-)?2g$/.test(navigator.connection?.effectiveType||""))return;
+    const key=post.shop_slug+":"+selected?.type+":"+selected?.id+":"+selected?.url;
+    if(feedWarmKey===key)return;
+    stopFeedWarm();feedWarmKey=key;
+    const controller=new AbortController();feedWarmAbort=controller;
+    const media=post.media.filter(m=>["photo","video"].includes(m.type)).map(m=>({type:m.type,sourceId:Number(m.id),url:m.url}));
+    const resolved=await feedPlaybackMedia(media,String(post.shop_slug||""));
+    if(controller.signal.aborted||document.hidden||viewerOpen)return;
+    const item=resolved.find(m=>m.type===selected?.type&&m.sourceId===Number(selected?.id));
+    if(!item||!validUrl(item.url))return;
+    let response;
+    try{
+      if(item.type==="video"){
+        // A bounded HTTP range warms at most 512 KiB; never run a decoder or
+        // download an entire video while scrolling. Skip unprocessed originals.
+        if(!item.playbackUrl||feedWarmedVideos.has(item.playbackUrl))return;
+        response=await fetch(item.playbackUrl,{headers:{Range:"bytes=0-524287"},signal:controller.signal,cache:"force-cache"});
+        if(response.status!==206||Number(response.headers.get("content-length"))>524288){controller.abort();return;}
+      }else{
+        if(feedPhotoCopies.has(item.url))return;
+        response=await fetch(item.url,{signal:controller.signal,cache:"force-cache"});
+        const length=Number(response.headers.get("content-length"));
+        if(!response.ok||length>2*1024*1024){controller.abort();return;}
+      }
+      const reader=response.body.getReader(),chunks=[];let size=0;
+      const limit=item.type==="video"?524288:2*1024*1024;
+      while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>limit){controller.abort();return;}if(item.type==="photo")chunks.push(value);}
+      if(controller.signal.aborted||document.hidden)return;
+      if(item.type==="video"){
+        feedWarmedVideos.add(item.playbackUrl);if(feedWarmedVideos.size>32)feedWarmedVideos.delete(feedWarmedVideos.values().next().value);
+      }else{
+        const type=response.headers.get("content-type")||"";if(!type.startsWith("image/"))return;
+        feedPhotoCopies.set(item.url,{url:URL.createObjectURL(new Blob(chunks,{type}))});
+        while(feedPhotoCopies.size>2){const old=feedPhotoCopies.keys().next().value;URL.revokeObjectURL(feedPhotoCopies.get(old).url);feedPhotoCopies.delete(old);}
+      }
+    }catch(_){}
+  }
+  if(feedMode){
+    document.addEventListener("visibilitychange",()=>{if(document.hidden)stopFeedWarm()});
+    window.addEventListener("shoufhon:viewport-open",stopFeedWarm);
+    window.addEventListener("pagehide",()=>{stopFeedWarm();for(const entry of feedPhotoCopies.values())URL.revokeObjectURL(entry.url);feedPhotoCopies.clear();});
+  }
   if(feedMode){
     // Keep footer labels and swipe guidance out of homepage feed viewing only.
     const feedViewerStyle=document.createElement("style");
@@ -14960,6 +15020,7 @@ function whatsappNumber(raw){
     document.head.appendChild(feedViewerStyle);
     root.style.display="none";
     window.ShoufHonFeedMedia={
+      prepare:prepareFeedMedia,
       async open(post,item,comments){
         if(viewerOpen)await closeMedia({fromPortalBack:true});
         const generation=++feedOpenGeneration;
@@ -14968,9 +15029,11 @@ function whatsappNumber(raw){
         SHOP_SLUG=String(post.shop_slug||"");
         root.setAttribute("data-shop-slug",SHOP_SLUG);
         engagementMap.clear();guestLikeStateShop="";
+        const card=document.querySelector('#shoufhon-shop-feed [data-post="'+post.post_id+'"]');
+        const previews=card?.querySelectorAll('.sf-picture');
         allMedia=post.media.filter(m=>["photo","video"].includes(m.type)).map((m,i)=>({
           type:m.type,id:m.type+"-"+m.id,sourceId:Number(m.id),url:validUrl(m.url)?m.url:"",
-          poster:validUrl(m.poster)?m.poster:"",sort:i,featured:false,createdAt:post.published_at
+          poster:validUrl(m.poster)?m.poster:"",previewUrl:previews?.[i]?.complete&&previews[i].naturalWidth>0?previews[i].currentSrc||previews[i].src:"",sort:i,featured:false,createdAt:post.published_at
         }));
         const resolvedMedia=await feedPlaybackMedia(allMedia,SHOP_SLUG);
         if(generation!==feedOpenGeneration)return;
@@ -15398,6 +15461,7 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
 
