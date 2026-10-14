@@ -5658,6 +5658,7 @@ body{
   // Keep original URLs for social actions/shares; only the player uses copies.
   const feedPlaybackCache=new Map();
   async function feedPlaybackMedia(media,slug){
+    if(typeof window!=="undefined"&&window.ShoufHonVideoDelivery?.galleryPlaybackMedia)return window.ShoufHonVideoDelivery.galleryPlaybackMedia(supabaseClient,media,slug);
     const ids=[...new Set(media.filter(item=>item.type==="video").map(item=>item.sourceId))];
     if(!ids.length)return media;
     const key=JSON.stringify([slug,media.filter(m=>m.type==="video").map(m=>[m.sourceId,m.url])]);
@@ -15461,6 +15462,7 @@ if(new URLSearchParams(location.search).get("media-debug")==="1"){
   document.head.appendChild(diagnostics);
 }
 </script>
+
 
 
 
