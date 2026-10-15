@@ -68,6 +68,75 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
 
 </script>
 
+<script src="__SHOUFHON_EMBED_BASE__shoufhon-public-shop-profile.js"></script>
+<script id="shoufhon-profile-image-crop-runtime">
+(function(){
+  "use strict";
+  const shell=document.getElementById("ma7alak-profile-shell");if(!shell)return;
+  let options={},queued=false;
+  const clamp=(value,min,max,fallback)=>value===undefined||value===null||value===""?fallback:Number.isFinite(Number(value))?Math.max(min,Math.min(max,Number(value))):fallback;
+  function crop(prefix,zoom,x,y){
+    shell.style.setProperty(prefix+"-size",zoom+"%");
+    shell.style.setProperty(prefix+"-left",((100-zoom)*x/100)+"%");
+    shell.style.setProperty(prefix+"-top",((100-zoom)*y/100)+"%");
+    shell.style.setProperty(prefix+"-x",x+"%");shell.style.setProperty(prefix+"-y",y+"%");
+  }
+  function apply(o){
+    if(!o||typeof o!=="object"||Array.isArray(o))return;options=o;
+    crop("--m7-banner-crop",clamp(o.profile_banner_zoom,100,300,100),clamp(o.profile_banner_position_x,0,100,50),clamp(o.profile_banner_position_y,0,100,50));
+    crop("--m7-logo-crop",clamp(o.profile_logo_image_zoom,100,300,100),clamp(o.profile_logo_image_position_x,0,100,50),clamp(o.profile_logo_image_position_y,0,100,50));
+    const banner=document.getElementById("ma7alak-profile-banner");
+    if(banner){
+      const raw=String(o.profile_banner_image_url||"").trim();
+      const url=/^https?:\/\//i.test(raw)?raw.replace(/\\/g,"%5C").replace(/"/g,"%22").replace(/[\r\n]/g,""):"";
+      shell.style.setProperty("--m7-banner-crop-image",url?'url("'+url+'")':"none");
+      const rawColor=String(o.profile_banner_color||"").trim();
+      const color=/^#[0-9a-f]{6}$/i.test(rawColor)?rawColor:"#171217";
+      const enabled=o.profile_banner_enabled===undefined?Boolean(url||/^#[0-9a-f]{6}$/i.test(rawColor)):o.profile_banner_enabled!==false&&String(o.profile_banner_enabled).toLowerCase()!=="false";
+      const styleName=String(o.profile_banner_style||"rounded-fade").toLowerCase();
+      // Image removal changes the surface, not the banner's height or logo overlap.
+      banner.classList.toggle("visible",enabled);
+      shell.classList.toggle("m7-profile-has-banner",enabled);
+      banner.toggleAttribute("data-solid-banner",!url);
+      window.ShoufHonBannerMedia?.apply(banner,o);
+      banner.style.setProperty("background-color",color,"important");
+      banner.classList.toggle("m7-banner-straight",styleName==="straight");
+      banner.classList.toggle("m7-banner-rounded",styleName==="rounded");
+      banner.classList.toggle("m7-banner-wave",styleName==="wave");
+      banner.classList.toggle("m7-banner-fade",styleName==="fade");
+      banner.classList.toggle("m7-banner-rounded-fade",styleName==="rounded-fade");
+      if(url){
+        banner.dataset.imageCrop="1";
+        banner.style.setProperty("background-image","none","important");
+      }else{
+        banner.removeAttribute("data-image-crop");
+        banner.style.setProperty("background-image","none","important");
+      }
+    }
+  }
+  function schedule(next){
+    if(next&&typeof next==="object"&&!Array.isArray(next))options=next;
+    if(queued)return;queued=true;
+    Promise.resolve().then(()=>{queued=false;if(typeof document!=="undefined"&&shell.isConnected)apply(options)});
+  }
+  const receive=e=>{const d=e.detail||{};if(d.directory_options||d.profile?.directory_options)schedule(d.directory_options||d.profile.directory_options)};
+  window.ShoufHonProfileBannerApply=apply;
+  for(const name of ["ma7alak:profile-design-preview","ma7alak:profile-design-saved","ma7alak:profile-draft-preview","shoufhon:design-preview"])window.addEventListener(name,receive);
+  window.addEventListener("message",e=>{
+    if(e.source!==window.parent&&e.source!==window.top)return;
+    const d=e.data||{};if(["MA7ALAK_DESIGN_PREVIEW","MA7ALAK_PROFILE_STATE","MA7ALAK_PROFILE_UPDATED"].includes(d.type))schedule(d.directory_options||d.profile?.directory_options);
+  });
+  window.addEventListener("resize",()=>schedule(),{passive:true});
+  window.addEventListener("pageshow",()=>schedule());
+  window.ShoufHonProfileImageCrop={apply,refresh:()=>schedule()};
+  schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
+  const slug=String(window.ShoufHonShopRelease?.slug||shell.getAttribute("data-shop-slug")||window.ShoufHonShopContextClient?.slug||"").trim().toLowerCase();
+  if(slug)window.ShoufHonProfileRowCache?.get(slug).then(result=>{
+    if(!result.error&&result.data)schedule(result.data.directory_options||{});
+  });
+})();
+</script>
+
 <!-- SHOUFHON — ONE SDK LOAD + ONE SHARED SUPABASE CLIENT PER SHOP EMBED -->
 <script>
 (function(){
@@ -1447,105 +1516,7 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
 }
 </style>
 <script>
-(function(){
-  "use strict";
-  if(window.ShoufHonProfileRowCache)return;
 
-  const URL="https://wdtaiuwtqdepzdamgsrs.supabase.co";
-  const KEY="sb_publishable_lzog5ZX19HK5_rFfer8Ylw_OPG_0bXl";
-  const COLUMNS="shop_slug,shop_name,profile_image_url,story_logo_url,category,category_name,arabic_name,is_active,verified,location,directory_options";
-  const TTL_MS=45000;
-  const cache=new Map();
-  const pending=new Map();
-  const dirty=new Set();
-
-  function key(value){
-    return String(value||"").trim().toLowerCase();
-  }
-
-  function invalidate(value){
-    const slug=key(value);
-    if(!slug){
-      cache.clear();
-      pending.forEach(function(_,pendingSlug){dirty.add(pendingSlug);});
-      return;
-    }
-    cache.delete(slug);
-    if(pending.has(slug))dirty.add(slug);
-  }
-
-  async function fetchProfile(slug,client){
-    /* Public identity must load independently of SDK and auth startup.
-       The publishable key has public SELECT access to this active row. */
-    try{
-      const params=new URLSearchParams();
-      params.set("select",COLUMNS);
-      params.set("shop_slug","eq."+slug);
-      params.set("limit","1");
-      const response=await fetch(URL+"/rest/v1/shop_profiles?"+params.toString(),{
-        method:"GET",
-        headers:{
-          "apikey":KEY,
-          "Accept":"application/json"
-        },
-        cache:"no-store"
-      });
-      const text=await response.text();
-      let payload=null;
-      try{payload=text?JSON.parse(text):null}catch(_){payload=null}
-      if(!response.ok){
-        return {data:null,error:{message:(payload&&payload.message)||"PROFILE_LOAD_FAILED",status:response.status}};
-      }
-      const row=Array.isArray(payload)?(payload[0]||null):payload;
-      return {data:row||null,error:null};
-    }catch(error){
-      return {data:null,error:error};
-    }
-  }
-
-  async function get(value,clientOrOptions,maybeOptions){
-    const slug=key(value);
-    if(!slug)return {data:null,error:{message:"MISSING_SHOP_SLUG"}};
-
-    const client=
-      clientOrOptions&&typeof clientOrOptions.from==="function"
-        ?clientOrOptions
-        :null;
-
-    const options=client
-      ?(maybeOptions||{})
-      :(clientOrOptions||{});
-
-    if(options&&options.force===true)invalidate(slug);
-
-    const hit=cache.get(slug);
-    if(hit&&Date.now()-hit.at<TTL_MS){
-      return {data:hit.data,error:null};
-    }
-    if(pending.has(slug))return pending.get(slug);
-
-    const task=(async function(){
-      let result=null;
-      do{
-        dirty.delete(slug);
-        result=await fetchProfile(slug,client);
-      }while(dirty.has(slug)&&!result.error);
-
-      if(!result.error&&result.data){
-        cache.set(slug,{data:result.data,at:Date.now()});
-      }
-      return result;
-    })().finally(function(){
-      if(pending.get(slug)===task)pending.delete(slug);
-      dirty.delete(slug);
-    });
-
-    pending.set(slug,task);
-    return task;
-  }
-
-  window.ShoufHonProfileRowCache={get:get,invalidate:invalidate};
-})();
 (async function(){
   "use strict";
 
@@ -3104,14 +3075,10 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
 
     try{
 
-      const profileClient =
-        await getRealtimeClient();
-
+      // Public hours use the same anonymous row as identity, independently
+      // of SDK/realtime startup. Realtime still connects below.
       const profileResult =
-        await window.ShoufHonProfileRowCache.get(
-          SHOP_SLUG,
-          profileClient
-        );
+        await window.ShoufHonProfileRowCache.get(SHOP_SLUG);
 
       if(profileResult.error){
         throw profileResult.error;
@@ -12972,16 +12939,15 @@ html,body{
   }
 
   async function load(){
-    const c=await getClient();
     const s=await resolveSlug();
 
-    if(!c||!s){
+    if(!s){
       applyPublicLocation("");
       return;
     }
 
     try{
-      const profileResult=await window.ShoufHonProfileRowCache.get(s,c);
+      const profileResult=await window.ShoufHonProfileRowCache.get(s);
 
       if(profileResult.error)throw profileResult.error;
       applyPublicLocation(profileResult.data?.location||"");
@@ -13643,69 +13609,7 @@ html body #ma7alak-profile-shell #ma7alak-story-preview img{
   object-fit:cover!important;object-position:var(--m7-logo-crop-x,50%) var(--m7-logo-crop-y,50%)!important;
 }
 </style>
-<script id="shoufhon-profile-image-crop-runtime">
-(function(){
-  "use strict";
-  const shell=document.getElementById("ma7alak-profile-shell");if(!shell)return;
-  let options={},queued=false;
-  const clamp=(value,min,max,fallback)=>value===undefined||value===null||value===""?fallback:Number.isFinite(Number(value))?Math.max(min,Math.min(max,Number(value))):fallback;
-  function crop(prefix,zoom,x,y){
-    shell.style.setProperty(prefix+"-size",zoom+"%");
-    shell.style.setProperty(prefix+"-left",((100-zoom)*x/100)+"%");
-    shell.style.setProperty(prefix+"-top",((100-zoom)*y/100)+"%");
-    shell.style.setProperty(prefix+"-x",x+"%");shell.style.setProperty(prefix+"-y",y+"%");
-  }
-  function apply(o){
-    if(!o||typeof o!=="object"||Array.isArray(o))return;options=o;
-    crop("--m7-banner-crop",clamp(o.profile_banner_zoom,100,300,100),clamp(o.profile_banner_position_x,0,100,50),clamp(o.profile_banner_position_y,0,100,50));
-    crop("--m7-logo-crop",clamp(o.profile_logo_image_zoom,100,300,100),clamp(o.profile_logo_image_position_x,0,100,50),clamp(o.profile_logo_image_position_y,0,100,50));
-    const banner=document.getElementById("ma7alak-profile-banner");
-    if(banner){
-      const raw=String(o.profile_banner_image_url||"").trim();
-      const url=/^https?:\/\//i.test(raw)?raw.replace(/\\/g,"%5C").replace(/"/g,"%22").replace(/[\r\n]/g,""):"";
-      shell.style.setProperty("--m7-banner-crop-image",url?'url("'+url+'")':"none");
-      const rawColor=String(o.profile_banner_color||"").trim();
-      const color=/^#[0-9a-f]{6}$/i.test(rawColor)?rawColor:"#171217";
-      const enabled=o.profile_banner_enabled===undefined?Boolean(url||/^#[0-9a-f]{6}$/i.test(rawColor)):o.profile_banner_enabled!==false&&String(o.profile_banner_enabled).toLowerCase()!=="false";
-      const styleName=String(o.profile_banner_style||"rounded-fade").toLowerCase();
-      // Image removal changes the surface, not the banner's height or logo overlap.
-      banner.classList.toggle("visible",enabled);
-      shell.classList.toggle("m7-profile-has-banner",enabled);
-      banner.toggleAttribute("data-solid-banner",!url);
-      window.ShoufHonBannerMedia?.apply(banner,o);
-      banner.style.setProperty("background-color",color,"important");
-      banner.classList.toggle("m7-banner-straight",styleName==="straight");
-      banner.classList.toggle("m7-banner-rounded",styleName==="rounded");
-      banner.classList.toggle("m7-banner-wave",styleName==="wave");
-      banner.classList.toggle("m7-banner-fade",styleName==="fade");
-      banner.classList.toggle("m7-banner-rounded-fade",styleName==="rounded-fade");
-      if(url){
-        banner.dataset.imageCrop="1";
-        banner.style.setProperty("background-image","none","important");
-      }else{
-        banner.removeAttribute("data-image-crop");
-        banner.style.setProperty("background-image","none","important");
-      }
-    }
-  }
-  function schedule(next){
-    if(next&&typeof next==="object"&&!Array.isArray(next))options=next;
-    if(queued)return;queued=true;
-    Promise.resolve().then(()=>{queued=false;if(typeof document!=="undefined"&&shell.isConnected)apply(options)});
-  }
-  const receive=e=>{const d=e.detail||{};if(d.directory_options||d.profile?.directory_options)schedule(d.directory_options||d.profile.directory_options)};
-  window.ShoufHonProfileBannerApply=apply;
-  for(const name of ["ma7alak:profile-design-preview","ma7alak:profile-design-saved","ma7alak:profile-draft-preview","shoufhon:design-preview"])window.addEventListener(name,receive);
-  window.addEventListener("message",e=>{
-    if(e.source!==window.parent&&e.source!==window.top)return;
-    const d=e.data||{};if(["MA7ALAK_DESIGN_PREVIEW","MA7ALAK_PROFILE_STATE","MA7ALAK_PROFILE_UPDATED"].includes(d.type))schedule(d.directory_options||d.profile?.directory_options);
-  });
-  window.addEventListener("resize",()=>schedule(),{passive:true});
-  window.addEventListener("pageshow",()=>schedule());
-  window.ShoufHonProfileImageCrop={apply};
-  schedule(window.Ma7alakProfileShell?.getCachedOptions?.()||window.__M7_PROFILE_STUDIO_LAST_OPTIONS__||{});
-})();
-</script>
+
 
 
 
