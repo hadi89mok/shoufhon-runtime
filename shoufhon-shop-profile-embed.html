@@ -33,6 +33,34 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
 }
 </style>
 <script>
+/* Visible-section recovery: no timer wakeups while hidden or scrolled away. */
+window.ShoufHonProfileRecovery=window.ShoufHonProfileRecovery||function(root,work,delay){
+  if(!root)return;
+  let timer=null,inView=true,stopped=false,running=false;
+  const visible=()=>!stopped&&!document.hidden&&inView&&window.ShoufHonEmbedVisibility?.visible!==false;
+  function arm(){
+    clearTimeout(timer);timer=null;
+    if(visible())timer=setTimeout(run,typeof delay==="function"?delay():delay);
+  }
+  async function run(){
+    if(!visible()||running)return;
+    running=true;
+    try{await work()}catch(error){console.warn("Shop recovery:",error)}
+    finally{running=false;arm()}
+  }
+  function resume(){clearTimeout(timer);timer=null;if(visible())run()}
+  const observer=typeof IntersectionObserver==="function"?new IntersectionObserver(entries=>{
+    const was=inView;inView=entries[0].isIntersecting;
+    if(inView&&!was)resume();else arm();
+  }):null;
+  observer?.observe(root);
+  document.addEventListener("visibilitychange",resume);
+  window.addEventListener("pagehide",()=>{stopped=true;clearTimeout(timer);timer=null});
+  window.addEventListener("pageshow",()=>{stopped=false;resume()});
+  arm();
+};
+</script>
+<script>
 (function(){
   "use strict";
   if(window.__SHOUFHON_EMBED_VISIBILITY_V1__)return;
@@ -3408,19 +3436,8 @@ html.m7-embed-suspended:not(#shoufhon-pause-guard):not(#shoufhon-pause-guard):no
   setupVisibilityPause();
 
 
-  clockTimer =
-    setInterval(
-      function(){
+  window.ShoufHonProfileRecovery(root,render,30000);
 
-        if(
-          (document.visibilityState === "visible" && window.ShoufHonEmbedVisibility?.visible !== false)
-        ){
-          render();
-        }
-
-      },
-      30000
-    );
 
 
   window.addEventListener(
@@ -7894,17 +7911,10 @@ window.__SHOUFHON_EMBED_SUPABASE_READY__ =
      event is missed. Hidden tabs do not query the database.
   ========================================================= */
 
-  setInterval(
-    function(){
-
-      if(
-        (document.visibilityState === "visible" && window.ShoufHonEmbedVisibility?.visible !== false)
-      ){
-        loadStories();
-      }
-
-    },
-    180000
+  window.ShoufHonProfileRecovery(
+    document.getElementById("ma7alak-profile-shell"),
+    loadStories,
+    ()=>ma7alakStoryRealtimeReady?600000:180000
   );
 
 
@@ -12008,23 +12018,9 @@ function startRealtime(){
 
 function startFallback(){
 
-  fallbackTimer =
-    setInterval(
-      function(){
-
-        if(
-          (document.visibilityState === "visible" && window.ShoufHonEmbedVisibility?.visible !== false)
-        ){
-
-          loadCount();
-
-          loadFollowingCount();
-
-        }
-
-      },
-      FALLBACK_SYNC_MS
-    );
+  window.ShoufHonProfileRecovery(root,async()=>{
+    await Promise.all([loadCount(),loadFollowingCount()]);
+  },FALLBACK_SYNC_MS);
 
 
   document
